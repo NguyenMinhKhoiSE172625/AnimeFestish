@@ -69,11 +69,22 @@ export function renderNavbar() {
   // Close mobile menu on link click
   document.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', () => {
-      mobileOpen = false;
-      document.getElementById('nav-links').classList.remove('mobile-open');
-      document.getElementById('mobile-toggle').textContent = '☰';
+      closeMobileMenu();
     });
   });
+
+  // Close mobile menu when clicking outside (on the overlay itself)
+  document.getElementById('nav-links').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('nav-links')) {
+      closeMobileMenu();
+    }
+  });
+
+  function closeMobileMenu() {
+    mobileOpen = false;
+    document.getElementById('nav-links').classList.remove('mobile-open');
+    document.getElementById('mobile-toggle').textContent = '☰';
+  }
 
   // Profile selector
   const profileSelector = document.getElementById('profile-selector');

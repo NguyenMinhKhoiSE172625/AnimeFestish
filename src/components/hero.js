@@ -77,8 +77,54 @@ export function renderHero(container, items) {
     });
   });
 
+  // Touch swipe support for mobile
+  setupSwipe(container, slides.length);
+
   // Auto-rotate
   startAutoRotate(container, slides.length);
+}
+
+function setupSwipe(container, total) {
+  const slidesEl = container.querySelector('.hero-slides');
+  if (!slidesEl) return;
+
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let isSwiping = false;
+
+  slidesEl.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    isSwiping = true;
+    // Pause auto-rotate while touching
+    clearInterval(heroInterval);
+  }, { passive: true });
+
+  slidesEl.addEventListener('touchend', (e) => {
+    if (!isSwiping) return;
+    isSwiping = false;
+
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    const diffX = touchStartX - touchEndX;
+    const diffY = touchStartY - touchEndY;
+
+    // Only swipe if horizontal movement is dominant and > 50px threshold
+    if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY)) {
+      if (diffX > 0) {
+        // Swipe left → next slide
+        const next = (currentSlide + 1) % total;
+        goToSlide(container, next, total);
+      } else {
+        // Swipe right → prev slide
+        const prev = (currentSlide - 1 + total) % total;
+        goToSlide(container, prev, total);
+      }
+    }
+
+    // Resume auto-rotate
+    startAutoRotate(container, total);
+  }, { passive: true });
 }
 
 function goToSlide(container, index, total) {

@@ -1457,6 +1457,62 @@ input {
   animation: fadeInUp 0.5s var(--ease-out) both;
 }
 
+/* === Touch Device Optimizations === */
+@media (hover: none) and (pointer: coarse) {
+  /* Disable hover effects on touch devices for better performance */
+  .anime-card:hover {
+    transform: none;
+  }
+
+  .anime-card:hover .anime-card-poster img {
+    transform: none;
+  }
+
+  .anime-card:hover .anime-card-overlay {
+    opacity: 0;
+  }
+
+  .anime-card:hover .anime-card-play {
+    opacity: 0;
+  }
+
+  /* Active state for touch feedback */
+  .anime-card:active {
+    transform: scale(0.97);
+    transition: transform 0.1s ease;
+  }
+
+  .btn:active {
+    transform: scale(0.96);
+    opacity: 0.9;
+  }
+
+  .episode-btn:active {
+    background: var(--accent-primary);
+    color: #fff;
+    transform: scale(0.96);
+  }
+
+  .filter-chip:active {
+    transform: scale(0.96);
+  }
+
+  .page-btn:active {
+    transform: scale(0.95);
+  }
+
+  /* Always show continue-remove button on touch */
+  .continue-remove {
+    opacity: 0.7;
+  }
+
+  /* Improve scroll momentum on touch */
+  .anime-row-scroll {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+}
+
 /* === Responsive === */
 @media (max-width: 1024px) {
   .hero {
@@ -1481,6 +1537,16 @@ input {
 
   .navbar-mobile-btn {
     display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    font-size: 1.4rem;
+  }
+
+  .navbar-mobile-btn:active {
+    background: rgba(255, 255, 255, 0.08);
   }
 
   .navbar-links.mobile-open {
@@ -1492,33 +1558,76 @@ input {
     right: 0;
     bottom: 0;
     background: var(--bg-primary);
-    padding: var(--space-xl);
-    gap: var(--space-lg);
+    padding: var(--space-xl) var(--space-lg);
+    gap: var(--space-sm);
     z-index: 999;
     animation: fadeInUp 0.3s var(--ease-out);
+    overflow-y: auto;
+  }
+
+  .navbar-links.mobile-open a {
+    font-size: 1.05rem;
+    padding: 14px 16px;
+    border-radius: 10px;
+    transition: background var(--duration-fast);
+  }
+
+  .navbar-links.mobile-open a:active {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .navbar-links.mobile-open a.active {
+    background: rgba(229, 9, 20, 0.12);
+    color: var(--accent-secondary);
   }
 
   .navbar-search.open input {
-    width: 160px;
+    width: 150px;
+    font-size: 0.82rem;
+  }
+
+  .navbar-inner {
+    padding: 0 var(--space-md);
+    gap: var(--space-sm);
+  }
+
+  .navbar-logo span {
+    font-size: 1.2rem;
   }
 
   .hero {
-    height: 65vh;
-    min-height: 380px;
+    height: 60vh;
+    min-height: 350px;
   }
 
   .hero-content {
     padding: 0 var(--space-lg);
     bottom: 12%;
+    max-width: 85%;
   }
 
   .hero-title {
-    font-size: 1.4rem;
+    font-size: 1.35rem;
+    margin-bottom: var(--space-sm);
+  }
+
+  .hero-meta {
+    gap: var(--space-sm);
+    font-size: 0.8rem;
+    margin-bottom: var(--space-sm);
+    flex-wrap: wrap;
   }
 
   .hero-desc {
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     -webkit-line-clamp: 2;
+    margin-bottom: var(--space-md);
+  }
+
+  .hero-badge {
+    font-size: 0.7rem;
+    padding: 3px 10px;
+    margin-bottom: var(--space-sm);
   }
 
   .btn {
@@ -1527,16 +1636,30 @@ input {
   }
 
   .section {
-    padding: var(--space-xl) var(--space-md);
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .section-title {
+    font-size: 1.15rem;
+  }
+
+  /* Hide scroll arrows on mobile - touch scroll is native */
+  .anime-row-arrow {
+    display: none;
   }
 
   .anime-card {
-    width: 140px;
+    width: 135px;
   }
 
   .anime-grid {
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
     gap: var(--space-md) var(--space-sm);
+  }
+
+  .detail-backdrop {
+    height: 45vh;
+    min-height: 280px;
   }
 
   .detail-main {
@@ -1546,7 +1669,7 @@ input {
   }
 
   .detail-poster {
-    width: 180px;
+    width: 160px;
   }
 
   .detail-categories {
@@ -1554,48 +1677,235 @@ input {
   }
 
   .detail-content {
-    margin-top: -120px;
+    margin-top: -100px;
+    padding: 0 var(--space-md);
+  }
+
+  .detail-title {
+    font-size: 1.3rem;
+  }
+
+  .detail-meta {
+    justify-content: center;
+    font-size: 0.8rem;
+  }
+
+  .detail-desc {
+    font-size: 0.85rem;
+  }
+
+  .episodes-section {
+    padding: 0 var(--space-md);
+  }
+
+  .episodes-grid {
+    gap: 6px;
+  }
+
+  .episode-btn {
+    min-width: 46px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
   }
 
   .watch-container {
     padding: var(--space-md);
   }
+
+  .watch-title {
+    font-size: 1.15rem;
+  }
+
+  .watch-nav {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .watch-nav .btn {
+    flex: 1;
+    min-width: 0;
+    justify-content: center;
+    text-align: center;
+    font-size: 0.78rem;
+    padding: 10px 12px;
+  }
+
+  .search-page {
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .search-bar-lg input {
+    padding: 14px 20px 14px 44px;
+    font-size: 0.95rem;
+  }
+
+  .category-header {
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .category-title {
+    font-size: 1.4rem;
+  }
+
+  .category-filters {
+    gap: 6px;
+  }
+
+  .filter-chip {
+    padding: 6px 12px;
+    font-size: 0.78rem;
+  }
+
+  .pagination {
+    gap: 4px;
+  }
+
+  .page-btn {
+    min-width: 36px;
+    height: 36px;
+    font-size: 0.82rem;
+  }
+
+  .footer {
+    padding: var(--space-2xl) var(--space-md) var(--space-lg);
+    margin-top: var(--space-2xl);
+  }
+
+  .footer-links {
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .hero-dots {
+    bottom: 20px;
+  }
+
+  .hero-dot {
+    width: 10px;
+    height: 10px;
+  }
+
+  .hero-dot.active {
+    width: 32px;
+  }
 }
 
 @media (max-width: 480px) {
   .hero {
-    height: 55vh;
-    min-height: 320px;
+    height: 50vh;
+    min-height: 300px;
   }
 
   .hero-content {
     bottom: 10%;
     padding: 0 var(--space-md);
+    max-width: 92%;
+  }
+
+  .hero-title {
+    font-size: 1.15rem;
+    line-height: 1.2;
+    margin-bottom: var(--space-xs);
+  }
+
+  .hero-meta {
+    font-size: 0.72rem;
+    gap: var(--space-xs);
+  }
+
+  .hero-desc {
+    font-size: 0.75rem;
+    -webkit-line-clamp: 1;
+    margin-bottom: var(--space-sm);
   }
 
   .hero-actions {
-    flex-direction: column;
+    flex-direction: row;
     gap: var(--space-sm);
   }
 
+  .hero-actions .btn {
+    padding: 10px 16px;
+    font-size: 0.78rem;
+    flex: 1;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .hero-badge {
+    font-size: 0.65rem;
+    padding: 2px 8px;
+  }
+
   .anime-card {
-    width: 120px;
+    width: 115px;
+  }
+
+  .anime-card-title {
+    font-size: 0.75rem;
+  }
+
+  .anime-card-sub {
+    font-size: 0.65rem;
   }
 
   .anime-grid {
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-sm);
+  }
+
+  .anime-grid .anime-card {
+    width: 100%;
   }
 
   .detail-backdrop {
-    height: 40vh;
+    height: 35vh;
+    min-height: 200px;
   }
 
   .detail-poster {
-    width: 140px;
+    width: 130px;
+  }
+
+  .detail-title {
+    font-size: 1.15rem;
+  }
+
+  .detail-content {
+    margin-top: -80px;
+  }
+
+  .detail-origin {
+    font-size: 0.8rem;
+  }
+
+  .detail-meta-tag {
+    font-size: 0.72rem;
+    padding: 3px 8px;
+  }
+
+  .detail-cat {
+    font-size: 0.72rem;
+    padding: 3px 10px;
+  }
+
+  .detail-desc {
+    font-size: 0.82rem;
+    line-height: 1.6;
+  }
+
+  .section {
+    padding: var(--space-md) var(--space-sm);
   }
 
   .section-title {
-    font-size: 1.1rem;
+    font-size: 1rem;
+    padding-left: 12px;
+  }
+
+  .section-more {
+    font-size: 0.78rem;
   }
 
   /* Always show remove button on mobile (no hover) */
@@ -1605,39 +1915,144 @@ input {
 
   /* Larger touch targets for mobile */
   .episode-btn {
-    min-height: 44px;
-    font-size: 0.85rem;
+    min-height: 42px;
+    font-size: 0.82rem;
+    min-width: 44px;
+    padding: 8px 10px;
   }
 
   .filter-chip {
-    min-height: 40px;
-    padding: 8px 16px;
-    font-size: 0.82rem;
+    min-height: 38px;
+    padding: 8px 14px;
+    font-size: 0.78rem;
   }
 
   .page-btn {
-    min-width: 40px;
-    min-height: 40px;
+    min-width: 36px;
+    min-height: 36px;
+    font-size: 0.8rem;
   }
 
   /* Fix full-width video on small screens */
   .player-wrapper {
     border-radius: 0;
-    margin-left: -16px;
-    margin-right: -16px;
-    width: calc(100% + 32px);
+    margin-left: calc(-1 * var(--space-sm));
+    margin-right: calc(-1 * var(--space-sm));
+    width: calc(100% + var(--space-sm) * 2);
   }
 
   .watch-container {
     padding: var(--space-sm);
   }
 
+  .watch-title {
+    font-size: 1.05rem;
+  }
+
+  .watch-ep-title {
+    font-size: 0.82rem;
+  }
+
   .watch-nav {
     flex-wrap: wrap;
   }
 
+  .watch-nav .btn {
+    font-size: 0.75rem;
+    padding: 8px 10px;
+  }
+
+  .server-tab {
+    font-size: 0.78rem;
+    padding: 7px 14px;
+  }
+
+  .episodes-title {
+    font-size: 1rem;
+  }
+
+  .search-bar-lg input {
+    padding: 12px 16px 12px 40px;
+    font-size: 0.9rem;
+    border-radius: 12px;
+  }
+
+  .search-bar-lg .search-icon {
+    left: 14px;
+    font-size: 1rem;
+  }
+
+  .category-title {
+    font-size: 1.2rem;
+  }
+
   .profile-selector span {
     display: none;
+  }
+
+  .profile-selector {
+    padding: 4px 8px;
+  }
+
+  .navbar-logo-img {
+    height: 32px;
+    width: 32px;
+  }
+
+  .navbar-logo span {
+    font-size: 1.05rem;
+  }
+
+  .footer-logo {
+    font-size: 1.4rem;
+  }
+
+  .footer-desc {
+    font-size: 0.8rem;
+  }
+
+  .footer-links a {
+    font-size: 0.8rem;
+  }
+
+  /* Scrollbar indicator for horizontal rows */
+  .anime-row-scroll {
+    scroll-padding: 0 var(--space-sm);
+    gap: var(--space-sm);
+  }
+}
+
+/* === Extra small screens (< 360px) === */
+@media (max-width: 360px) {
+  .hero {
+    height: 45vh;
+    min-height: 260px;
+  }
+
+  .hero-title {
+    font-size: 1.05rem;
+  }
+
+  .hero-actions .btn {
+    padding: 8px 12px;
+    font-size: 0.72rem;
+  }
+
+  .anime-card {
+    width: 105px;
+  }
+
+  .anime-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .navbar-logo span {
+    font-size: 0.95rem;
+  }
+
+  .detail-poster {
+    width: 110px;
   }
 }
 

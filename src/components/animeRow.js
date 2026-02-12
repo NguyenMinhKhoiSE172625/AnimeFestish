@@ -29,12 +29,15 @@ export function renderAnimeRow(container, title, items, moreLink = null) {
   const leftArrow = section.querySelector('.anime-row-arrow.left');
   const rightArrow = section.querySelector('.anime-row-arrow.right');
 
+  // Adaptive scroll distance based on viewport
+  const getScrollDistance = () => Math.min(600, window.innerWidth * 0.8);
+
   leftArrow.addEventListener('click', () => {
-    scrollContainer.scrollBy({ left: -600, behavior: 'smooth' });
+    scrollContainer.scrollBy({ left: -getScrollDistance(), behavior: 'smooth' });
   });
 
   rightArrow.addEventListener('click', () => {
-    scrollContainer.scrollBy({ left: 600, behavior: 'smooth' });
+    scrollContainer.scrollBy({ left: getScrollDistance(), behavior: 'smooth' });
   });
 
   container.appendChild(section);
