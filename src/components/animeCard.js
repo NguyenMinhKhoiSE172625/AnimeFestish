@@ -1,11 +1,11 @@
 // === Anime Card Component ===
-import { getImageUrl } from '../js/api.js';
+import { getImageUrl, toWebpUrl } from '../js/api.js';
 
 function resolveImg(item) {
   const file = item.thumb_url || item.poster_url;
   if (!file) return '';
-  if (file.startsWith('http')) return file;
-  if (item._imgCdn) return `${item._imgCdn}${file}`;
+  if (file.startsWith('http')) return toWebpUrl(file);
+  if (item._imgCdn) return toWebpUrl(`${item._imgCdn}${file}`);
   return getImageUrl(file);
 }
 

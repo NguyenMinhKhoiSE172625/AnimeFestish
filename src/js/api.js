@@ -2,6 +2,12 @@
 // Sources: KKPhim (phimapi.com) + OPhim (ophim1.com) + NguonC (phim.nguonc.com)
 // KKPhim + OPhim use compatible formats; NguonC uses a different format and is adapted
 
+// === M3U8 Ad-Cleaning Proxy ===
+const M3U8_PROXY_BASE = 'https://openapiphim.pathhubphim.workers.dev';
+
+// === WebP Image Conversion ===
+const WEBP_PROXY = '/api2/image.php';
+
 const SOURCES_OPHIM = [
   {
     name: 'PhimAPI',
@@ -27,25 +33,48 @@ const SOURCE_NGUONC = {
 const ALL_SOURCES = [...SOURCES_OPHIM, SOURCE_NGUONC];
 
 // === Image URL Builder ===
+
+/**
+ * Convert phimimg.com URLs to WebP format for faster loading
+ */
+export function toWebpUrl(url) {
+  if (!url) return '';
+  if (url.includes('phimimg.com')) {
+    return `${WEBP_PROXY}?url=${encodeURIComponent(url)}`;
+  }
+  return url;
+}
+
 export function getImageUrl(filename, sourceIdx = 0) {
   if (!filename) return '';
-  if (filename.startsWith('http')) return filename;
+  if (filename.startsWith('http')) return toWebpUrl(filename);
   const cdn = SOURCES_OPHIM[sourceIdx]?.imgCdn || SOURCES_OPHIM[0].imgCdn;
-  return `${cdn}${filename}`;
+  return toWebpUrl(`${cdn}${filename}`);
 }
 
 export function getImageUrlForSource(filename, sourceName) {
   if (!filename) return '';
-  if (filename.startsWith('http')) return filename;
+  if (filename.startsWith('http')) return toWebpUrl(filename);
   const source = ALL_SOURCES.find(s => s.name === sourceName) || SOURCES_OPHIM[0];
-  return source.imgCdn ? `${source.imgCdn}${filename}` : filename;
+  return source.imgCdn ? toWebpUrl(`${source.imgCdn}${filename}`) : filename;
 }
+
+// === API Response Cache ===
+const apiCache = new Map();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 // === Low-level Fetch Helpers ===
 async function fetchJSON(url) {
+  const now = Date.now();
+  const cached = apiCache.get(url);
+  if (cached && (now - cached.time) < CACHE_TTL) {
+    return cached.data;
+  }
   const res = await fetch(url);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
+  const data = await res.json();
+  apiCache.set(url, { data, time: now });
+  return data;
 }
 
 async function fetchFromOphim(source, path) {
@@ -459,4 +488,21 @@ export async function fetchNewUpdates(page = 1) {
     item.country?.some(c => c.slug === 'nhat-ban')
   );
   return { items: deduplicateBySlug(japanItems.length > 0 ? japanItems : allItems) };
+}
+
+
+/**
+ * Get ad-free M3U8 URL via proxy
+ */
+export function getCleanM3u8Url(m3u8Url) {
+  if (!m3u8Url) return '';
+  return `${M3U8_PROXY_BASE}/clean?url=${encodeURIComponent(m3u8Url)}`;
+}
+
+/**
+ * Get proxied encryption key URL (CORS bypass)
+ */
+export function getProxiedKeyUrl(keyUrl) {
+  if (!keyUrl) return '';
+  return `${M3U8_PROXY_BASE}/key?url=${encodeURIComponent(keyUrl)}`;
 }

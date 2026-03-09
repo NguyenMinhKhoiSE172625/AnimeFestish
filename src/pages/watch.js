@@ -1,5 +1,5 @@
 // === Watch Page ===
-import { fetchAnimeDetail, getImageUrl } from '../js/api.js';
+import { fetchAnimeDetail, getImageUrl, getCleanM3u8Url, toWebpUrl } from '../js/api.js';
 import { navigate } from '../js/router.js';
 import { saveWatchProgress, getWatchProgress } from '../js/watchHistory.js';
 
@@ -7,6 +7,74 @@ function decodeHtml(html) {
   const txt = document.createElement('textarea');
   txt.innerHTML = html || '';
   return txt.value;
+}
+
+let currentHls = null;
+let HlsLib = null;
+
+async function loadHls() {
+  if (!HlsLib) {
+    const mod = await import('hls.js');
+    HlsLib = mod.default;
+  }
+  return HlsLib;
+}
+
+function destroyHls() {
+  if (currentHls) {
+    currentHls.destroy();
+    currentHls = null;
+  }
+}
+
+async function initHlsPlayer(m3u8Url, embedFallbackUrl) {
+  const wrapper = document.getElementById('player-wrapper');
+  if (!wrapper) return;
+
+  destroyHls();
+
+  const cleanUrl = getCleanM3u8Url(m3u8Url);
+  wrapper.innerHTML = `<video id="hls-player" controls playsinline crossorigin="anonymous" style="width:100%;height:100%;background:#000"></video>`;
+  const video = document.getElementById('hls-player');
+
+  try {
+    const Hls = await loadHls();
+
+    if (Hls.isSupported()) {
+      const hls = new Hls();
+      currentHls = hls;
+      hls.loadSource(cleanUrl);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        video.play().catch(() => {});
+      });
+      hls.on(Hls.Events.ERROR, (event, data) => {
+        if (data.fatal) {
+          destroyHls();
+          const fallback = embedFallbackUrl || m3u8Url;
+          wrapper.innerHTML = `<iframe id="player-iframe" src="${fallback}" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture; fullscreen" loading="lazy" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>`;
+        }
+      });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      // Safari native HLS
+      video.src = cleanUrl;
+      video.addEventListener('loadedmetadata', () => {
+        video.play().catch(() => {});
+      });
+    }
+  } catch (err) {
+    console.warn('HLS.js load failed, falling back to iframe:', err);
+    const fallback = embedFallbackUrl || m3u8Url;
+    wrapper.innerHTML = `<iframe id="player-iframe" src="${fallback}" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture; fullscreen" loading="lazy" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>`;
+  }
+}
+
+function initIframePlayer(embedUrl) {
+  const wrapper = document.getElementById('player-wrapper');
+  if (!wrapper) return;
+
+  destroyHls();
+  wrapper.innerHTML = `<iframe id="player-iframe" src="${embedUrl}" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture; fullscreen" loading="lazy" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>`;
 }
 
 export async function renderWatchPage({ slug, ep }) {
@@ -84,8 +152,9 @@ export async function renderWatchPage({ slug, ep }) {
       0, 0
     );
 
-    // Build embed URL
-    const embedUrl = currentEp.link_embed || currentEp.link_m3u8 || '';
+    // Determine player mode
+    const m3u8Url = currentEp.link_m3u8 || '';
+    const embedUrl = currentEp.link_embed || '';
 
     // Find prev/next episodes
     const currentFlatIdx = allEpsFlat.findIndex(e => (e.slug === ep || e.name === ep));
@@ -95,7 +164,9 @@ export async function renderWatchPage({ slug, ep }) {
     main.innerHTML = `
       <div class="watch-container">
         <div class="player-wrapper" id="player-wrapper">
-          ${embedUrl ? `
+          ${m3u8Url ? `
+            <video id="hls-player" controls playsinline crossorigin="anonymous" style="width:100%;height:100%;background:#000"></video>
+          ` : embedUrl ? `
             <iframe 
               id="player-iframe"
               src="${embedUrl}" 
@@ -143,7 +214,8 @@ export async function renderWatchPage({ slug, ep }) {
                 return `
                   <button class="server-tab ${idx === currentServerIdx ? 'active' : ''}" 
                           data-server-idx="${idx}"
-                          data-ep-link="${epInServer ? (epInServer.link_embed || epInServer.link_m3u8 || '') : ''}">
+                          data-ep-m3u8="${epInServer ? (epInServer.link_m3u8 || '') : ''}"
+                          data-ep-embed="${epInServer ? (epInServer.link_embed || '') : ''}">
                     ${server.server_name || `Server ${idx + 1}`}
                   </button>
                 `;
@@ -167,37 +239,45 @@ export async function renderWatchPage({ slug, ep }) {
       </div>
     `;
 
+    // Initialize HLS player if m3u8 available
+    if (m3u8Url) {
+      initHlsPlayer(m3u8Url, embedUrl);
+    }
+
     // Event listeners
     const prevBtn = main.querySelector('#prev-ep-btn');
     const nextBtn = main.querySelector('#next-ep-btn');
 
     if (prevBtn) {
-      prevBtn.addEventListener('click', () => navigate(`/watch/${slug}/${prevBtn.dataset.ep}`));
+      prevBtn.addEventListener('click', () => {
+        destroyHls();
+        navigate(`/watch/${slug}/${prevBtn.dataset.ep}`);
+      });
     }
     if (nextBtn) {
-      nextBtn.addEventListener('click', () => navigate(`/watch/${slug}/${nextBtn.dataset.ep}`));
+      nextBtn.addEventListener('click', () => {
+        destroyHls();
+        navigate(`/watch/${slug}/${nextBtn.dataset.ep}`);
+      });
     }
 
     // Episode buttons
     main.querySelectorAll('.episode-btn').forEach(btn => {
-      btn.addEventListener('click', () => navigate(`/watch/${slug}/${btn.dataset.ep}`));
+      btn.addEventListener('click', () => {
+        destroyHls();
+        navigate(`/watch/${slug}/${btn.dataset.ep}`);
+      });
     });
 
     // Server tabs
     main.querySelectorAll('.server-tab').forEach(tab => {
       tab.addEventListener('click', () => {
-        const link = tab.dataset.epLink;
-        if (link) {
-          const wrapper = document.getElementById('player-wrapper');
-          wrapper.innerHTML = `
-            <iframe 
-              id="player-iframe"
-              src="${link}" 
-              allowfullscreen 
-              allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-              sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-            ></iframe>
-          `;
+        const tabM3u8 = tab.dataset.epM3u8;
+        const tabEmbed = tab.dataset.epEmbed;
+        if (tabM3u8) {
+          initHlsPlayer(tabM3u8, tabEmbed);
+        } else if (tabEmbed) {
+          initIframePlayer(tabEmbed);
         }
         main.querySelectorAll('.server-tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
@@ -214,4 +294,6 @@ export async function renderWatchPage({ slug, ep }) {
       </div>
     `;
   }
+
+  return () => destroyHls();
 }

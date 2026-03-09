@@ -1,5 +1,5 @@
 // === Anime Detail Page ===
-import { fetchAnimeDetail, getImageUrl, fetchKitsuPoster } from '../js/api.js';
+import { fetchAnimeDetail, getImageUrl, fetchKitsuPoster, toWebpUrl } from '../js/api.js';
 import { navigate } from '../js/router.js';
 
 function decodeHtml(html) {
@@ -47,8 +47,8 @@ export async function renderDetailPage({ slug }) {
     const imgCdn = resp._imgCdn || movie._imgCdn || '';
     function resolveImg(file) {
       if (!file) return '';
-      if (file.startsWith('http')) return file;
-      if (imgCdn) return `${imgCdn}${file}`;
+      if (file.startsWith('http')) return toWebpUrl(file);
+      if (imgCdn) return toWebpUrl(`${imgCdn}${file}`);
       return getImageUrl(file);
     }
 

@@ -95,6 +95,7 @@ body {
   line-height: 1.6;
   overflow-x: hidden;
   min-height: 100vh;
+  min-width: 320px;
   position: relative;
 }
 
@@ -1097,6 +1098,13 @@ input {
   border: none;
 }
 
+.player-wrapper video {
+  width: 100%;
+  height: 100%;
+  background: #000;
+  outline: none;
+}
+
 .watch-info {
   padding: var(--space-lg) 0;
 }
@@ -1664,6 +1672,81 @@ input {
 }
 
 /* === Responsive === */
+
+/* Large desktop / zoom-out — ensure content scales properly */
+@media (min-width: 1600px) {
+  :root {
+    --content-max: 1600px;
+  }
+
+  .anime-card {
+    width: 210px;
+  }
+
+  .anime-grid {
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: var(--space-xl) var(--space-lg);
+  }
+
+  .hero {
+    height: 90vh;
+    max-height: 900px;
+  }
+
+  .hero-content {
+    max-width: 650px;
+  }
+
+  .hero-title {
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .detail-poster {
+    width: 260px;
+  }
+
+  .watch-container {
+    max-width: 1300px;
+  }
+}
+
+@media (min-width: 1920px) {
+  :root {
+    --content-max: 1800px;
+  }
+
+  .anime-card {
+    width: 230px;
+  }
+
+  .anime-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+@media (min-width: 2560px) {
+  :root {
+    --content-max: 2200px;
+  }
+
+  .anime-card {
+    width: 260px;
+  }
+
+  .anime-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+
+  .hero-content {
+    max-width: 800px;
+    padding: 0 var(--space-3xl);
+  }
+}
+
 @media (max-width: 1024px) {
   .hero {
     height: 70vh;
