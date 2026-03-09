@@ -289,31 +289,27 @@ export async function searchAnime(keyword, page = 1) {
  * Fetch anime detail — try each source until one succeeds
  */
 export async function fetchAnimeDetail(slug) {
-  // Try OPhim-compatible sources first
-  for (const source of SOURCES_OPHIM) {
-    try {
-      const data = await fetchFromOphim(source, `/v1/api/phim/${slug}`);
-      if (data && (data.data || data.movie || data.item)) {
-        const result = data;
-        if (result.data?.item) {
-          result.data.item._source = source.name;
-          result.data.item._imgCdn = source.imgCdn;
-        }
-        result._source = source.name;
-        result._imgCdn = source.imgCdn;
-        return result;
+  // Race all sources in parallel — first valid response wins
+  const ophimPromises = SOURCES_OPHIM.map(async (source) => {
+    const data = await fetchFromOphim(source, `/v1/api/phim/${slug}`);
+    if (data && (data.data || data.movie || data.item)) {
+      const result = data;
+      if (result.data?.item) {
+        result.data.item._source = source.name;
+        result.data.item._imgCdn = source.imgCdn;
       }
-    } catch (e) {
-      continue;
+      result._source = source.name;
+      result._imgCdn = source.imgCdn;
+      return result;
     }
-  }
+    throw new Error('no data');
+  });
 
-  // Try NguonC
-  try {
+  const nguoncPromise = (async () => {
     const data = await fetchFromNguonc(`/api/film/${slug}`);
     if (data && data.status === 'success' && data.movie) {
       const movie = data.movie;
-      const adapted = {
+      return {
         data: {
           item: {
             name: movie.name,
@@ -339,13 +335,15 @@ export async function fetchAnimeDetail(slug) {
         _source: 'NguonC',
         _imgCdn: '',
       };
-      return adapted;
     }
-  } catch (e) {
-    console.warn('[NguonC] Detail failed:', e.message);
-  }
+    throw new Error('no data');
+  })();
 
-  throw new Error('Không tìm thấy anime trên bất kỳ nguồn nào');
+  try {
+    return await Promise.any([...ophimPromises, nguoncPromise]);
+  } catch {
+    throw new Error('Không tìm thấy anime trên bất kỳ nguồn nào');
+  }
 }
 
 /**

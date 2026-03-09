@@ -48,8 +48,8 @@ const contentObserver = new MutationObserver(() => {
 });
 contentObserver.observe(mainContent, { childList: true, subtree: true });
 
-// Intro animation — show for at least 2s then fade out
-const INTRO_MIN_MS = 2000;
+// Intro animation — show briefly then fade out
+const INTRO_MIN_MS = 600;
 const introStart = performance.now();
 
 window.addEventListener('load', () => {
@@ -60,7 +60,7 @@ window.addEventListener('load', () => {
     const overlay = document.getElementById('loading-overlay');
     if (overlay) {
       overlay.classList.add('hidden');
-      setTimeout(() => overlay.remove(), 600);
+      setTimeout(() => overlay.remove(), 400);
     }
   }, remaining);
 });
