@@ -1,5 +1,5 @@
 // === Home Page — Japanese Anime Focused ===
-import { fetchAnimeList, fetchJapaneseAnime, fetchByCategory, fetchTopMovies, fetchTopSeries } from '../js/api.js';
+import { fetchAnimeList, fetchJapaneseAnime, fetchByCategory, fetchTopAnimeMovies, fetchTopAnimeSeries } from '../js/api.js';
 import { filterAnimeOnly, filterJapaneseAnime } from '../js/animeFilter.js';
 import { getContinueWatching } from '../js/watchHistory.js';
 import { renderHero, stopHero } from '../components/hero.js';
@@ -59,15 +59,15 @@ export async function renderHomePage() {
       renderAnimeRow(content, 'Mới Cập Nhật 🔥', newest, '#/anime');
     }
 
-    // 2. Top 10 Phim Lẻ & Phim Bộ (fetch in background, don't block)
+    // 2. Top 10 Anime (fetch in background, don't block)
     const top10Container = document.createElement('div');
     content.appendChild(top10Container);
-    Promise.allSettled([fetchTopMovies(10), fetchTopSeries(10)]).then(([moviesResult, seriesResult]) => {
+    Promise.allSettled([fetchTopAnimeMovies(10), fetchTopAnimeSeries(10)]).then(([moviesResult, seriesResult]) => {
       if (moviesResult.status === 'fulfilled' && moviesResult.value.length > 0) {
-        renderTop10Row(top10Container, 'Top 10 Phim Lẻ Hôm Nay 🎬', moviesResult.value);
+        renderTop10Row(top10Container, 'Top Anime Movie 🎬', moviesResult.value);
       }
       if (seriesResult.status === 'fulfilled' && seriesResult.value.length > 0) {
-        renderTop10Row(top10Container, 'Top 10 Phim Bộ Hôm Nay 📺', seriesResult.value);
+        renderTop10Row(top10Container, 'Top Anime Bộ 📺', seriesResult.value);
       }
     });
 

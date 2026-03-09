@@ -509,28 +509,32 @@ export function getProxiedKeyUrl(keyUrl) {
 
 
 /**
- * Fetch Top 10 phim lẻ (movies) today — sorted by latest update
+ * Fetch Top 10 anime movies (phim lẻ hoạt hình Nhật Bản) today
  */
-export async function fetchTopMovies(limit = 10) {
+export async function fetchTopAnimeMovies(limit = 10) {
   const [ophimResult, nguoncResult] = await Promise.allSettled([
-    fetchAllOphim(`/v1/api/danh-sach/phim-le?page=1&sort_field=modified.time&limit=${limit}`),
-    fetchNguoncList(`/api/films/danh-sach/phim-le?page=1`, 'single'),
+    fetchAllOphim(`/v1/api/danh-sach/phim-le?page=1&sort_field=modified.time&category=hoat-hinh&country=nhat-ban&limit=${limit}`),
+    fetchNguoncList(`/api/films/the-loai/hoat-hinh?page=1`, 'hoathinh'),
   ]);
 
   const allItems = [];
   if (ophimResult.status === 'fulfilled') allItems.push(...ophimResult.value.items);
-  if (nguoncResult.status === 'fulfilled') allItems.push(...nguoncResult.value.items);
+  if (nguoncResult.status === 'fulfilled') {
+    // NguonC doesn't support combined filters, so filter client-side for movies
+    const movies = nguoncResult.value.items.filter(i => i.type === 'single' || i.episode_current === 'Full');
+    allItems.push(...movies);
+  }
 
   return deduplicateBySlug(allItems).slice(0, limit);
 }
 
 /**
- * Fetch Top 10 phim bộ (series) today — sorted by latest update
+ * Fetch Top 10 anime series (phim bộ hoạt hình Nhật Bản) today
  */
-export async function fetchTopSeries(limit = 10) {
+export async function fetchTopAnimeSeries(limit = 10) {
   const [ophimResult, nguoncResult] = await Promise.allSettled([
-    fetchAllOphim(`/v1/api/danh-sach/phim-bo?page=1&sort_field=modified.time&limit=${limit}`),
-    fetchNguoncList(`/api/films/danh-sach/phim-bo?page=1`, 'series'),
+    fetchAllOphim(`/v1/api/danh-sach/hoat-hinh?page=1&sort_field=modified.time&country=nhat-ban&limit=${limit}`),
+    fetchNguoncList(`/api/films/danh-sach/hoat-hinh?page=1`, 'hoathinh'),
   ]);
 
   const allItems = [];
