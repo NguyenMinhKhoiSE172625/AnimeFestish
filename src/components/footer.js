@@ -7,7 +7,7 @@ export function renderFooter() {
       <div class="footer-inner">
         <div class="footer-logo">AnimeFetish</div>
         <p class="footer-desc">
-          Website xem anime Nhật Bản vietsub miễn phí. Kho anime phong phú, cập nhật nhanh từ KKPhim. Chỉ phục vụ anime chất lượng cao.
+          Website xem anime Nhật Bản vietsub miễn phí. Kho anime phong phú, cập nhật nhanh. Chỉ phục vụ anime chất lượng cao.
         </p>
         <div class="footer-links">
           <a href="#/">Trang chủ</a>
@@ -16,7 +16,7 @@ export function renderFooter() {
           <a href="#/category/tinh-cam">Tình Cảm</a>
           <a href="#/search/">Tìm kiếm</a>
         </div>
-        <p class="footer-copy">© ${new Date().getFullYear()} AnimeFetish. Nguồn phim từ KKPhim — Chỉ anime Nhật Bản.</p>
+        <p class="footer-copy">© ${new Date().getFullYear()} AnimeFetish. Chỉ anime Nhật Bản.</p>
       </div>
     </div>
   `;
