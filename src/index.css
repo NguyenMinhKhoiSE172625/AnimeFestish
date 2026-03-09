@@ -886,7 +886,7 @@ input {
 /* === Top 10 Ranking Row === */
 .top10-card {
   flex-shrink: 0;
-  width: 200px;
+  width: 280px;
   position: relative;
   cursor: pointer;
   display: flex;
@@ -904,7 +904,7 @@ input {
   position: absolute;
   left: -10px;
   bottom: 10px;
-  font-size: 7rem;
+  font-size: 10rem;
   font-weight: 900;
   line-height: 0.8;
   color: transparent;
@@ -922,11 +922,11 @@ input {
 
 .top10-poster {
   position: relative;
-  width: 140px;
+  width: 190px;
   aspect-ratio: 2/3;
   border-radius: var(--card-radius);
   overflow: hidden;
-  margin-left: 50px;
+  margin-left: 70px;
   background: var(--bg-card);
   border: 1px solid rgba(139, 92, 246, 0.1);
   transition: border-color var(--duration-normal), box-shadow var(--duration-normal);
@@ -952,13 +952,13 @@ input {
 .top10-info {
   position: absolute;
   bottom: -4px;
-  left: 50px;
-  width: 140px;
+  left: 70px;
+  width: 190px;
   z-index: 3;
 }
 
 .top10-info .anime-card-title {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   text-align: center;
   padding: 4px 2px;
 }
@@ -1984,22 +1984,22 @@ input {
   }
 
   .top10-card {
-    width: 160px;
+    width: 210px;
   }
 
   .top10-rank {
-    font-size: 5.5rem;
+    font-size: 7rem;
     left: -6px;
   }
 
   .top10-poster {
-    width: 110px;
-    margin-left: 40px;
+    width: 145px;
+    margin-left: 50px;
   }
 
   .top10-info {
-    left: 40px;
-    width: 110px;
+    left: 50px;
+    width: 145px;
   }
 
   .anime-grid {
@@ -2193,23 +2193,23 @@ input {
   }
 
   .top10-card {
-    width: 140px;
+    width: 170px;
   }
 
   .top10-rank {
-    font-size: 4.5rem;
+    font-size: 5.5rem;
     left: -4px;
     -webkit-text-stroke: 2px rgba(139, 92, 246, 0.35);
   }
 
   .top10-poster {
-    width: 95px;
-    margin-left: 35px;
+    width: 115px;
+    margin-left: 42px;
   }
 
   .top10-info {
-    left: 35px;
-    width: 95px;
+    left: 42px;
+    width: 115px;
   }
 
   .top10-info .anime-card-title {
