@@ -132,12 +132,18 @@ function tagItems(items, source) {
   }));
 }
 
-// Deduplicate items by slug (prefer first occurrence)
+// Deduplicate items by slug + name (catches cross-source dupes with different slugs)
 function deduplicateBySlug(items) {
   const seen = new Set();
   return items.filter(item => {
-    if (!item?.slug || seen.has(item.slug)) return false;
+    if (!item?.slug) return false;
+    if (seen.has(item.slug)) return false;
     seen.add(item.slug);
+    const name = (item.name || '').trim().toLowerCase();
+    if (name) {
+      if (seen.has('n:' + name)) return false;
+      seen.add('n:' + name);
+    }
     return true;
   });
 }

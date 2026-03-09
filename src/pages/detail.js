@@ -59,13 +59,13 @@ export async function renderDetailPage({ slug }) {
 
     main.innerHTML = `
       <div class="detail-backdrop">
-        <img src="${posterUrl}" alt="${movie.name}" />
+        <img src="${thumbUrl}" alt="${movie.name}" />
         <div class="detail-backdrop-gradient"></div>
       </div>
       <div class="detail-content">
         <div class="detail-main">
           <div class="detail-poster">
-            <img src="${thumbUrl}" alt="${movie.name}" />
+            <img src="${posterUrl}" alt="${movie.name}" />
           </div>
           <div class="detail-info">
             <h1 class="detail-title">${movie.name}</h1>
