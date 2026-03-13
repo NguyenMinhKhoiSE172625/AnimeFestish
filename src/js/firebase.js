@@ -1,7 +1,7 @@
 // === Firebase Configuration ===
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, terminate } from 'firebase/firestore';
+import { getFirestore } from 'firebase/firestore';
 const firebaseConfig = {
   apiKey: 'AIzaSyB_jCaqK8TwwuzmyumNSQkDdEesz6RryK8',
   authDomain: 'animefetish-6f591.firebaseapp.com',
@@ -22,13 +22,6 @@ export function getDb() {
     _db = getFirestore(app);
   }
   return _db;
-}
-
-export async function terminateDb() {
-  if (_db) {
-    try { await terminate(_db); } catch (_) {}
-    _db = null;
-  }
 }
 
 // Suppress uncatchable Firestore internal assertion errors (SDK bug when rules reject)

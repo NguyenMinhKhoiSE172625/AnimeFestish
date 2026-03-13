@@ -7,21 +7,14 @@ import {
   addDoc,
   query,
   orderBy,
-  onSnapshot,
+  getDocs,
   serverTimestamp,
   deleteDoc,
   doc,
+  Timestamp,
 } from 'firebase/firestore';
 
-let unsubscribe = null;
-
 export function renderComments(container, slug) {
-  // Cleanup previous listener
-  if (unsubscribe) {
-    unsubscribe();
-    unsubscribe = null;
-  }
-
   container.innerHTML = `
     <div class="comments-section">
       <h2 class="episodes-title">Bình luận</h2>
@@ -34,6 +27,69 @@ export function renderComments(container, slug) {
 
   const formArea = container.querySelector('#comment-form-area');
   const listEl = container.querySelector('#comment-list');
+
+  // Fetch and render comments list
+  async function loadComments() {
+    try {
+      const db = getDb();
+      const commentsRef = collection(db, 'comments', slug, 'messages');
+      const q = query(commentsRef, orderBy('createdAt', 'desc'));
+      const snapshot = await getDocs(q);
+
+      if (snapshot.empty) {
+        listEl.innerHTML = `
+          <div class="comment-empty">
+            <span>💬</span>
+            <p>Chưa có bình luận nào. Hãy là người đầu tiên!</p>
+          </div>
+        `;
+        return;
+      }
+
+      const currentUid = getUser()?.uid;
+      listEl.innerHTML = snapshot.docs.map(docSnap => {
+        const c = docSnap.data();
+        const time = c.createdAt ? formatTime(c.createdAt.toDate()) : 'Vừa xong';
+        const initial = (c.displayName || '?').charAt(0).toUpperCase();
+        const isOwn = currentUid && c.uid === currentUid;
+
+        return `
+          <div class="comment-item" data-id="${docSnap.id}">
+            ${c.photoURL
+              ? `<img class="comment-avatar" src="${c.photoURL}" alt="${c.displayName}" referrerpolicy="no-referrer" />`
+              : `<div class="comment-avatar comment-avatar-initial">${initial}</div>`}
+            <div class="comment-body">
+              <div class="comment-header">
+                <span class="comment-name">${escapeHtml(c.displayName)}</span>
+                <span class="comment-time">${time}</span>
+                ${isOwn ? `<button class="comment-delete" data-doc-id="${docSnap.id}" title="Xóa">✕</button>` : ''}
+              </div>
+              <p class="comment-text">${escapeHtml(c.text)}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Delete handlers
+      listEl.querySelectorAll('.comment-delete').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const docId = btn.dataset.docId;
+          if (confirm('Xóa bình luận này?')) {
+            try {
+              const db = getDb();
+              await deleteDoc(doc(db, 'comments', slug, 'messages', docId));
+              await loadComments();
+            } catch (err) {
+              console.error('Delete comment error:', err);
+            }
+          }
+        });
+      });
+    } catch (err) {
+      console.error('Load comments error:', err);
+      listEl.innerHTML = `<div class="comment-empty"><p>Lỗi tải bình luận</p></div>`;
+    }
+  }
 
   // Auth-aware form
   const renderForm = (user) => {
@@ -80,10 +136,12 @@ export function renderComments(container, slug) {
             text,
             createdAt: serverTimestamp(),
           });
+          await loadComments();
         } catch (err) {
           console.error('Comment send error:', err);
           input.value = text;
           sendBtn.disabled = false;
+          alert('Gửi bình luận thất bại: ' + err.message);
         }
       };
 
@@ -110,77 +168,11 @@ export function renderComments(container, slug) {
   // Listen to auth changes
   const unsubAuth = onUserChange(renderForm);
 
-  // Real-time comments
-  try {
-    const db = getDb();
-    const commentsRef = collection(db, 'comments', slug, 'messages');
-    const q = query(commentsRef, orderBy('createdAt', 'desc'));
-
-    unsubscribe = onSnapshot(q, (snapshot) => {
-      if (snapshot.empty) {
-        listEl.innerHTML = `
-          <div class="comment-empty">
-            <span>💬</span>
-            <p>Chưa có bình luận nào. Hãy là người đầu tiên!</p>
-          </div>
-        `;
-        return;
-      }
-
-      const currentUid = getUser()?.uid;
-      listEl.innerHTML = snapshot.docs.map(docSnap => {
-        const c = docSnap.data();
-        const time = c.createdAt ? formatTime(c.createdAt.toDate()) : 'Vừa xong';
-        const initial = (c.displayName || '?').charAt(0).toUpperCase();
-        const isOwn = currentUid && c.uid === currentUid;
-
-        return `
-          <div class="comment-item" data-id="${docSnap.id}">
-            ${c.photoURL
-              ? `<img class="comment-avatar" src="${c.photoURL}" alt="${c.displayName}" referrerpolicy="no-referrer" />`
-              : `<div class="comment-avatar comment-avatar-initial">${initial}</div>`}
-            <div class="comment-body">
-              <div class="comment-header">
-                <span class="comment-name">${escapeHtml(c.displayName)}</span>
-                <span class="comment-time">${time}</span>
-                ${isOwn ? `<button class="comment-delete" data-doc-id="${docSnap.id}" title="Xóa">✕</button>` : ''}
-              </div>
-              <p class="comment-text">${escapeHtml(c.text)}</p>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      // Delete handlers
-      listEl.querySelectorAll('.comment-delete').forEach(btn => {
-        btn.addEventListener('click', async () => {
-          const docId = btn.dataset.docId;
-          if (confirm('Xóa bình luận này?')) {
-            try {
-              const db = getDb();
-              await deleteDoc(doc(db, 'comments', slug, 'messages', docId));
-            } catch (err) {
-              console.error('Delete comment error:', err);
-            }
-          }
-        });
-      });
-    }, (err) => {
-      console.error('Comments listener error:', err);
-      if (unsubscribe) { unsubscribe(); unsubscribe = null; }
-      listEl.innerHTML = `<div class="comment-empty"><p>Lỗi tải bình luận. Vui lòng tải lại trang.</p></div>`;
-    });
-  } catch (err) {
-    console.error('Firestore init error:', err);
-    listEl.innerHTML = `<div class="comment-empty"><p>Không thể tải bình luận</p></div>`;
-  }
+  // Load comments
+  loadComments();
 
   // Return cleanup function
   return () => {
-    if (unsubscribe) {
-      unsubscribe();
-      unsubscribe = null;
-    }
     unsubAuth();
   };
 }
