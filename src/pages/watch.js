@@ -3,6 +3,7 @@ import { fetchAnimeDetail, getImageUrl, getCleanM3u8Url, toWebpUrl } from '../js
 import { navigate } from '../js/router.js';
 import { saveWatchProgress, getWatchProgress } from '../js/watchHistory.js';
 import { updateSEO } from '../js/seo.js';
+import { renderComments } from '../components/comments.js';
 
 function decodeHtml(html) {
   const txt = document.createElement('textarea');
@@ -91,6 +92,7 @@ export async function renderWatchPage({ slug, ep }) {
     </div>
   `;
 
+  let cleanupComments = null;
   try {
     const resp = await fetchAnimeDetail(slug);
     const data = resp.data || resp;
@@ -247,6 +249,8 @@ export async function renderWatchPage({ slug, ep }) {
             `).join('')}
           </div>
         </div>
+
+        <div id="watch-comments"></div>
       </div>
     `;
 
@@ -295,6 +299,12 @@ export async function renderWatchPage({ slug, ep }) {
       });
     });
 
+    // Firestore comments
+    const commentsContainer = main.querySelector('#watch-comments');
+    if (commentsContainer) {
+      cleanupComments = renderComments(commentsContainer, slug);
+    }
+
   } catch (err) {
     console.error('Watch page error:', err);
     main.innerHTML = `
@@ -308,6 +318,7 @@ export async function renderWatchPage({ slug, ep }) {
 
   return () => {
     destroyHls();
+    if (cleanupComments) cleanupComments();
     document.body.classList.remove('watching');
   };
 }

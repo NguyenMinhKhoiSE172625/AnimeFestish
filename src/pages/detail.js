@@ -2,6 +2,7 @@
 import { fetchAnimeDetail, getImageUrl, fetchKitsuPoster, toWebpUrl } from '../js/api.js';
 import { navigate } from '../js/router.js';
 import { updateSEO } from '../js/seo.js';
+import { renderComments } from '../components/comments.js';
 
 function decodeHtml(html) {
   const txt = document.createElement('textarea');
@@ -124,6 +125,9 @@ export async function renderDetailPage({ slug }) {
           </div>
         </div>
       `}
+
+
+      <div id="detail-comments"></div>
     `;
 
     // Episode button clicks
@@ -157,6 +161,12 @@ export async function renderDetailPage({ slug }) {
           if (backdropEl) backdropEl.src = kitsu.cover || kitsu.poster;
         }
       });
+    }
+
+    // Firestore comments
+    const commentsContainer = main.querySelector('#detail-comments');
+    if (commentsContainer) {
+      renderComments(commentsContainer, slug);
     }
 
   } catch (err) {

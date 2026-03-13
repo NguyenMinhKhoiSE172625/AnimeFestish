@@ -1,13 +1,13 @@
 // === Navbar Component ===
 import { navigate } from '../js/router.js';
-import { getProfiles, getCurrentProfile, setCurrentProfile, addProfile } from '../js/watchHistory.js';
+import { onUserChange, logout } from '../js/auth.js';
+import { renderLoginPopup } from './loginPopup.js';
 
 let mobileOpen = false;
 let searchOpen = false;
 
 export function renderNavbar() {
   const navbar = document.getElementById('navbar');
-  const currentProfile = getCurrentProfile();
 
   navbar.innerHTML = `
     <div class="navbar" id="nav">
@@ -31,10 +31,8 @@ export function renderNavbar() {
           <button class="navbar-search-btn" id="search-toggle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></button>
           <input type="text" placeholder="Tìm anime..." id="search-input" />
         </div>
-        <div class="profile-selector" id="profile-selector">
-          <div class="profile-avatar">${currentProfile.charAt(0).toUpperCase()}</div>
-          <span>${currentProfile}</span>
-          <div class="profile-dropdown" id="profile-dropdown"></div>
+        <div class="auth-area" id="auth-area">
+          <button class="btn-login" id="login-btn">Đăng nhập</button>
         </div>
         <button class="navbar-mobile-btn" id="mobile-toggle">☰</button>
       </div>
@@ -108,70 +106,56 @@ export function renderNavbar() {
     document.getElementById('mobile-toggle').textContent = '☰';
   }
 
-  // Profile selector
-  const profileSelector = document.getElementById('profile-selector');
-  const profileDropdown = document.getElementById('profile-dropdown');
+  // Auth area
+  const authArea = document.getElementById('auth-area');
 
-  profileSelector.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = profileDropdown.classList.toggle('open');
-    if (isOpen) {
-      renderProfileDropdown();
+  onUserChange((user) => {
+    if (user) {
+      const photo = user.photoURL || '';
+      const name = user.displayName || user.email || 'User';
+      const initial = name.charAt(0).toUpperCase();
+      authArea.innerHTML = `
+        <div class="profile-selector" id="profile-selector">
+          ${photo ? `<img class="auth-avatar" src="${photo}" alt="${name}" referrerpolicy="no-referrer" />` : `<div class="profile-avatar">${initial}</div>`}
+          <span class="auth-name">${name.split(' ')[0]}</span>
+          <div class="profile-dropdown" id="profile-dropdown"></div>
+        </div>
+      `;
+      const selector = document.getElementById('profile-selector');
+      const dropdown = document.getElementById('profile-dropdown');
+
+      selector.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = dropdown.classList.toggle('open');
+        if (isOpen) {
+          dropdown.innerHTML = `
+            <div class="auth-dropdown-info">
+              <div class="auth-dropdown-name">${name}</div>
+              <div class="auth-dropdown-email">${user.email || ''}</div>
+            </div>
+            <div style="border-top:1px solid var(--border-color);margin:4px 0;"></div>
+            <button class="profile-item" id="logout-btn">🚪 Đăng xuất</button>
+          `;
+          dropdown.querySelector('#logout-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            logout();
+            dropdown.classList.remove('open');
+          });
+        }
+      });
+
+      document.addEventListener('click', () => {
+        dropdown.classList.remove('open');
+      });
+    } else {
+      authArea.innerHTML = `<button class="btn-login" id="login-btn">Đăng nhập</button>`;
+      authArea.querySelector('#login-btn').addEventListener('click', renderLoginPopup);
     }
   });
 
-  // Close dropdown when clicking outside
-  document.addEventListener('click', () => {
-    profileDropdown.classList.remove('open');
-  });
-
-  function renderProfileDropdown() {
-    const profiles = getProfiles();
-    const current = getCurrentProfile();
-    
-    profileDropdown.innerHTML = `
-      ${profiles.map(p => `
-        <button class="profile-item ${p === current ? 'active' : ''}" data-profile="${p}">
-          <div class="profile-avatar">${p.charAt(0).toUpperCase()}</div>
-          ${p}
-        </button>
-      `).join('')}
-      <div style="border-top:1px solid var(--border-color);margin:4px 0;"></div>
-      <input class="profile-add-input" id="new-profile-input" placeholder="+ Thêm người xem..." />
-    `;
-
-    // Profile switch
-    profileDropdown.querySelectorAll('.profile-item').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const name = btn.dataset.profile;
-        setCurrentProfile(name);
-        profileDropdown.classList.remove('open');
-        // Update UI
-        profileSelector.querySelector('.profile-avatar').textContent = name.charAt(0).toUpperCase();
-        const spanEl = profileSelector.querySelector('span');
-        if (spanEl) spanEl.textContent = name;
-        // Re-render current page to reflect new profile history
-        navigate(window.location.pathname || '/');
-      });
-    });
-
-    // Add new profile
-    const input = profileDropdown.querySelector('#new-profile-input');
-    input.addEventListener('click', (e) => e.stopPropagation());
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && input.value.trim()) {
-        const name = input.value.trim();
-        addProfile(name);
-        setCurrentProfile(name);
-        profileDropdown.classList.remove('open');
-        profileSelector.querySelector('.profile-avatar').textContent = name.charAt(0).toUpperCase();
-        const spanEl = profileSelector.querySelector('span');
-        if (spanEl) spanEl.textContent = name;
-        navigate(window.location.pathname || '/');
-      }
-    });
-  }
+  // Initial login button
+  const loginBtn = document.getElementById('login-btn');
+  if (loginBtn) loginBtn.addEventListener('click', renderLoginPopup);
 
   // Scroll effect
   window.addEventListener('scroll', () => {
