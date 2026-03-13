@@ -1,7 +1,7 @@
 // === Firebase Configuration ===
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, terminate } from 'firebase/firestore';
 const firebaseConfig = {
   apiKey: 'AIzaSyB_jCaqK8TwwuzmyumNSQkDdEesz6RryK8',
   authDomain: 'animefetish-6f591.firebaseapp.com',
@@ -23,3 +23,17 @@ export function getDb() {
   }
   return _db;
 }
+
+export async function terminateDb() {
+  if (_db) {
+    try { await terminate(_db); } catch (_) {}
+    _db = null;
+  }
+}
+
+// Suppress uncatchable Firestore internal assertion errors (SDK bug when rules reject)
+window.addEventListener('error', (e) => {
+  if (e.message?.includes('FIRESTORE') && e.message?.includes('INTERNAL ASSERTION FAILED')) {
+    e.preventDefault();
+  }
+});
