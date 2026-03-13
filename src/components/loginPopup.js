@@ -174,6 +174,7 @@ export function renderLoginPopup() {
     const btn = document.getElementById('login-submit');
     const text = document.getElementById('login-submit-text');
     const spinner = document.getElementById('login-spinner');
+    if (!btn || !text || !spinner) return;
     if (loading) {
       btn.disabled = true;
       text.style.display = 'none';
@@ -187,12 +188,14 @@ export function renderLoginPopup() {
 
   function showError(msg) {
     const el = document.getElementById('login-error');
+    if (!el) return;
     el.textContent = msg;
     el.style.display = 'block';
   }
 
   function clearError() {
     const el = document.getElementById('login-error');
+    if (!el) return;
     el.textContent = '';
     el.style.display = 'none';
   }
