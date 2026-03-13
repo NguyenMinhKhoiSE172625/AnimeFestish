@@ -351,7 +351,16 @@ export async function fetchAnimeDetail(slug) {
             _source: 'NguonC',
             _imgCdn: '',
           },
-          episodes: movie.episodes || [],
+          episodes: (movie.episodes || []).map(server => ({
+            server_name: server.server_name || 'Server',
+            server_data: (server.server_data || server.items || []).map(ep => ({
+              name: ep.name,
+              slug: ep.slug,
+              filename: ep.filename || '',
+              link_embed: ep.link_embed || ep.embed || '',
+              link_m3u8: ep.link_m3u8 || ep.m3u8 || '',
+            })),
+          })),
         },
         _source: 'NguonC',
         _imgCdn: '',
