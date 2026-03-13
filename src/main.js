@@ -49,7 +49,7 @@ const contentObserver = new MutationObserver(() => {
 contentObserver.observe(mainContent, { childList: true, subtree: true });
 
 // Intro animation — show briefly then fade out
-const INTRO_MIN_MS = 600;
+const INTRO_MIN_MS = 300;
 const introStart = performance.now();
 
 window.addEventListener('load', () => {

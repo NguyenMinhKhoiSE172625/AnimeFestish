@@ -72,12 +72,48 @@
   <body>
     <div id="app">
       <nav id="navbar"></nav>
-      <main id="main-content"></main>
+      <main id="main-content">
+        <!-- SEO: Static content for crawlers — replaced by JS on load -->
+        <div id="seo-fallback">
+          <h1>AnimeFetish — Xem Anime Vietsub HD Miễn Phí</h1>
+          <p>Website xem anime Nhật Bản vietsub miễn phí chất lượng cao Full HD. Kho anime phá đạo với hàng nghìn bộ phim hoạt hình, cập nhật nhanh nhất 2026.</p>
+          <h2>Thể loại Anime</h2>
+          <nav>
+            <a href="/anime">Tất cả Anime</a> •
+            <a href="/category/hanh-dong">Hành Động</a> •
+            <a href="/category/tinh-cam">Tình Cảm</a> •
+            <a href="/category/vien-tuong">Viễn Tưởng</a> •
+            <a href="/category/phieu-luu">Phiêu Lưu</a> •
+            <a href="/category/hai-huoc">Hài Hước</a> •
+            <a href="/category/bi-an">Bí Ẩn</a> •
+            <a href="/category/kinh-di">Kinh Dị</a> •
+            <a href="/category/tam-ly">Tâm Lý</a> •
+            <a href="/category/the-thao">Thể Thao</a> •
+            <a href="/category/am-nhac">Âm Nhạc</a> •
+            <a href="/search">Tìm kiếm Anime</a>
+          </nav>
+          <h2>Anime đang hot</h2>
+          <p>Xem One Piece, Jujutsu Kaisen, Spy x Family, Dragon Ball, Naruto, Attack on Titan, Demon Slayer, My Hero Academia, Chainsaw Man, Solo Leveling và hàng nghìn bộ anime khác với vietsub chất lượng cao trên AnimeFetish.</p>
+        </div>
+      </main>
+      <noscript>
+        <div style="padding:40px;text-align:center;color:#fff;background:#0b0b14;">
+          <h1>AnimeFetish — Xem Anime Vietsub HD Miễn Phí</h1>
+          <p>Vui lòng bật JavaScript để xem anime. Hoặc truy cập các liên kết bên dưới:</p>
+          <p>
+            <a href="/anime" style="color:#a78bfa">Danh sách Anime</a> |
+            <a href="/category/hanh-dong" style="color:#a78bfa">Hành Động</a> |
+            <a href="/category/tinh-cam" style="color:#a78bfa">Tình Cảm</a> |
+            <a href="/category/vien-tuong" style="color:#a78bfa">Viễn Tưởng</a> |
+            <a href="/search" style="color:#a78bfa">Tìm kiếm</a>
+          </p>
+        </div>
+      </noscript>
       <footer id="footer"></footer>
     </div>
     <!-- Intro / Loading Screen -->
-    <div id="loading-overlay" class="loading-overlay">
-      <img class="intro-logo" src="/Gemini_Generated_Image_l00nrdl00nrdl00n-removebg-preview.png" alt="AnimeFetish Logo" />
+    <div id="loading-overlay" class="loading-overlay" aria-hidden="true">
+      <img class="intro-logo" src="/Gemini_Generated_Image_l00nrdl00nrdl00n-removebg-preview.png" alt="AnimeFetish Logo" width="140" height="140" />
       <div class="intro-title">AnimeFetish</div>
       <div class="intro-subtitle">Japanese Anime • Vietsub • Full HD</div>
     </div>

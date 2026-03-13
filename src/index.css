@@ -179,6 +179,18 @@ input {
   background: rgba(139, 92, 246, 0.5);
 }
 
+/* SEO fallback — visible to crawlers, hidden once JS loads */
+#seo-fallback {
+  padding: 40px 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  color: var(--text-secondary);
+}
+#seo-fallback h1 { font-size: 1.5rem; color: var(--text-primary); margin-bottom: 12px; }
+#seo-fallback h2 { font-size: 1.1rem; color: var(--text-primary); margin: 20px 0 8px; }
+#seo-fallback a { color: var(--accent-primary); text-decoration: none; }
+#seo-fallback nav { line-height: 2; }
+
 /* === Intro / Loading Overlay === */
 .loading-overlay {
   position: fixed;
@@ -203,8 +215,8 @@ input {
   width: 140px;
   height: 140px;
   object-fit: contain;
-  animation: introLogoIn 1.2s var(--ease-out) forwards,
-             introPulse 2s ease-in-out 1.2s infinite;
+  animation: introLogoIn 0.6s var(--ease-out) forwards,
+ introPulse 2s ease-in-out 0.6s infinite;
   filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.5))
           drop-shadow(0 0 60px rgba(236, 72, 153, 0.3));
   mix-blend-mode: screen;
@@ -220,7 +232,7 @@ input {
   margin-top: 20px;
   opacity: 0;
   transform: translateY(10px);
-  animation: introTextIn 0.8s var(--ease-out) 0.6s forwards;
+  animation: introTextIn 0.4s var(--ease-out) 0.2s forwards;
   letter-spacing: 2px;
 }
 
@@ -230,7 +242,7 @@ input {
   letter-spacing: 4px;
   text-transform: uppercase;
   opacity: 0;
-  animation: introTextIn 0.8s var(--ease-out) 1s forwards;
+  animation: introTextIn 0.4s var(--ease-out) 0.35s forwards;
   margin-top: 6px;
 }
 
