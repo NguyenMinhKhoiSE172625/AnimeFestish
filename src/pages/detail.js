@@ -55,14 +55,29 @@ export async function renderDetailPage({ slug }) {
     }
 
     const posterUrl = resolveImg(movie.poster_url || movie.thumb_url);
+    const thumbUrl = resolveImg(movie.thumb_url || movie.poster_url);
+    const plainDesc = (movie.content || movie.description || '').replace(/<[^>]*>/g, '').trim();
     updateSEO({
       title: `${movie.name}${movie.origin_name ? ' - ' + movie.origin_name : ''} Việtsub HD`,
-      description: `Xem ${movie.name} vietsub miễn phí chất lượng cao. ${(movie.content || movie.description || '').replace(/<[^>]*>/g, '').slice(0, 150)}`,
-      image: posterUrl || thumbUrl,
+      description: `Xem ${movie.name} vietsub miễn phí chất lượng cao. ${plainDesc.slice(0, 150)}`,
+      image: posterUrl,
       url: `/anime/${slug}`,
       type: 'video.other',
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@type': movie.type === 'single' ? 'Movie' : 'TVSeries',
+        name: movie.name,
+        alternateName: movie.origin_name || undefined,
+        description: plainDesc.slice(0, 300),
+        image: posterUrl,
+        url: `https://animefetish.id.vn/anime/${slug}`,
+        dateModified: movie.modified?.time || undefined,
+        inLanguage: 'vi',
+        genre: (movie.category || []).map(c => c.name),
+        countryOfOrigin: (movie.country || []).map(c => c.name).join(', ') || undefined,
+        numberOfEpisodes: movie.episode_total ? parseInt(movie.episode_total) : undefined,
+      },
     });
-    const thumbUrl = resolveImg(movie.thumb_url || movie.poster_url);
     const categories = movie.category || [];
     const countries = movie.country || [];
 

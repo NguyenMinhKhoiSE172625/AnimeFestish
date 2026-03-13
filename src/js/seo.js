@@ -44,7 +44,7 @@ function setCanonical(url) {
  * @param {string} [opts.url] - Canonical URL path (e.g. '/#/anime/one-piece')
  * @param {string} [opts.type] - OG type (default: 'website')
  */
-export function updateSEO({ title, description, image, url, type } = {}) {
+export function updateSEO({ title, description, image, url, type, jsonLd } = {}) {
   const fullTitle = title ? `${title} | ${SITE_NAME}` : DEFAULTS.title;
   const desc = description || DEFAULTS.description;
   const img = image || DEFAULTS.image;
@@ -71,6 +71,20 @@ export function updateSEO({ title, description, image, url, type } = {}) {
 
   // Canonical
   setCanonical(fullUrl);
+
+  // JSON-LD Structured Data
+  let ldEl = document.getElementById('dynamic-ld-json');
+  if (jsonLd) {
+    if (!ldEl) {
+      ldEl = document.createElement('script');
+      ldEl.id = 'dynamic-ld-json';
+      ldEl.type = 'application/ld+json';
+      document.head.appendChild(ldEl);
+    }
+    ldEl.textContent = JSON.stringify(jsonLd);
+  } else if (ldEl) {
+    ldEl.remove();
+  }
 }
 
 /**
