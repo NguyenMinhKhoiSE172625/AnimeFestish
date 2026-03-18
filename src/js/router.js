@@ -71,11 +71,15 @@ export async function handleRouteChange() {
   } else {
     resetSEO();
     mainContent.innerHTML = `
-      <div class="empty-state" style="padding-top: 120px;">
-        <div class="empty-state-icon">🔍</div>
-        <div class="empty-state-text">Không tìm thấy trang này</div>
-        <a href="/" class="btn btn-primary" style="margin-top: 16px;">Về trang chủ</a>
-      </div>
+      <section class="empty-state notfound-state">
+        <div class="empty-state-icon">🔎</div>
+        <div class="empty-state-text">Không tìm thấy trang bạn đang mở</div>
+        <p class="notfound-hint">Liên kết có thể đã thay đổi hoặc nội dung không còn khả dụng.</p>
+        <div class="notfound-actions">
+          <a href="/" class="btn btn-primary">Về trang chủ</a>
+          <a href="/search" class="btn btn-outline">Đi tới tìm kiếm</a>
+        </div>
+      </section>
     `;
   }
 }

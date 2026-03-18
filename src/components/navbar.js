@@ -13,7 +13,9 @@ export function renderNavbar() {
     <div class="navbar" id="nav">
       <div class="navbar-inner">
         <div class="navbar-logo" id="nav-logo">
-          <img src="/Gemini_Generated_Image_l00nrdl00nrdl00n-removebg-preview.png" alt="Logo" class="navbar-logo-img" />
+          <span class="navbar-logo-mark" aria-hidden="true">
+            <img src="/Gemini_Generated_Image_l00nrdl00nrdl00n-removebg-preview.png" alt="Logo" class="navbar-logo-img" />
+          </span>
           <span class="navbar-logo-text">AnimeFetish</span>
         </div>
         <div class="navbar-links" id="nav-links">
@@ -27,14 +29,19 @@ export function renderNavbar() {
           <a href="/category/tinh-cam" class="nav-link" data-route="/category/tinh-cam">Tình Cảm</a>
           <a href="/category/vien-tuong" class="nav-link" data-route="/category/vien-tuong">Viễn Tưởng</a>
         </div>
-        <div class="navbar-search" id="nav-search">
-          <button class="navbar-search-btn" id="search-toggle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></button>
-          <input type="text" placeholder="Tìm anime..." id="search-input" />
+        <div class="navbar-actions">
+          <div class="navbar-search" id="nav-search">
+            <button class="navbar-search-btn" id="search-toggle" aria-label="Mở tìm kiếm" aria-expanded="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></button>
+            <input type="text" placeholder="Tìm anime..." id="search-input" aria-label="Tìm kiếm anime" />
+          </div>
+          <div class="auth-area" id="auth-area">
+            <button class="btn-login" id="login-btn">Đăng nhập</button>
+          </div>
+          <button class="navbar-mobile-btn" id="mobile-toggle" aria-label="Mở menu điều hướng" aria-controls="nav-links" aria-expanded="false">
+            <span class="mobile-toggle-line"></span>
+            <span class="mobile-toggle-line"></span>
+          </button>
         </div>
-        <div class="auth-area" id="auth-area">
-          <button class="btn-login" id="login-btn">Đăng nhập</button>
-        </div>
-        <button class="navbar-mobile-btn" id="mobile-toggle">☰</button>
       </div>
     </div>
     <div class="bottom-nav" id="bottom-nav">
@@ -60,9 +67,11 @@ export function renderNavbar() {
   // Search toggle
   const searchContainer = document.getElementById('nav-search');
   const searchInput = document.getElementById('search-input');
-  document.getElementById('search-toggle').addEventListener('click', () => {
+  const searchToggle = document.getElementById('search-toggle');
+  searchToggle.addEventListener('click', () => {
     searchOpen = !searchOpen;
     searchContainer.classList.toggle('open', searchOpen);
+    searchToggle.setAttribute('aria-expanded', String(searchOpen));
     if (searchOpen) searchInput.focus();
   });
 
@@ -77,12 +86,14 @@ export function renderNavbar() {
   });
 
   // Mobile menu
-  document.getElementById('mobile-toggle').addEventListener('click', () => {
+  const mobileToggle = document.getElementById('mobile-toggle');
+  mobileToggle.addEventListener('click', () => {
     mobileOpen = !mobileOpen;
     const links = document.getElementById('nav-links');
     links.classList.toggle('mobile-open', mobileOpen);
     document.getElementById('mobile-backdrop').classList.toggle('active', mobileOpen);
-    document.getElementById('mobile-toggle').textContent = mobileOpen ? '✕' : '☰';
+    mobileToggle.classList.toggle('is-open', mobileOpen);
+    mobileToggle.setAttribute('aria-expanded', String(mobileOpen));
   });
 
   // Close mobile menu on link click
@@ -103,8 +114,21 @@ export function renderNavbar() {
     mobileOpen = false;
     document.getElementById('nav-links').classList.remove('mobile-open');
     document.getElementById('mobile-backdrop').classList.remove('active');
-    document.getElementById('mobile-toggle').textContent = '☰';
+    mobileToggle.classList.remove('is-open');
+    mobileToggle.setAttribute('aria-expanded', 'false');
   }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (mobileOpen) {
+      closeMobileMenu();
+    }
+    if (searchOpen) {
+      searchOpen = false;
+      searchContainer.classList.remove('open');
+      searchToggle.setAttribute('aria-expanded', 'false');
+    }
+  });
 
   // Auth area
   const authArea = document.getElementById('auth-area');
@@ -200,17 +224,30 @@ function updateActiveLink() {
   const path = window.location.pathname || '/';
   document.querySelectorAll('.nav-link').forEach(link => {
     const route = link.getAttribute('data-route');
-    link.classList.toggle('active', path === route || (route !== '/' && path.startsWith(route)));
+    const isActive = path === route || (route !== '/' && path.startsWith(route));
+    link.classList.toggle('active', isActive);
+    if (isActive) {
+      link.setAttribute('aria-current', 'page');
+    } else {
+      link.removeAttribute('aria-current');
+    }
   });
   // Bottom nav
   document.querySelectorAll('.bottom-nav-item').forEach(item => {
     const route = item.dataset.route;
+    let isActive = false;
     if (route === '/search') {
-      item.classList.toggle('active', path.startsWith('/search'));
+      isActive = path.startsWith('/search');
     } else if (route === '/') {
-      item.classList.toggle('active', path === '/');
+      isActive = path === '/';
     } else {
-      item.classList.toggle('active', path === route || path.startsWith(route));
+      isActive = path === route || path.startsWith(route);
+    }
+    item.classList.toggle('active', isActive);
+    if (isActive) {
+      item.setAttribute('aria-current', 'page');
+    } else {
+      item.removeAttribute('aria-current');
     }
   });
 }

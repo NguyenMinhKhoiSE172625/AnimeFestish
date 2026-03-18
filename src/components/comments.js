@@ -76,6 +76,7 @@ export function renderComments(container, slug) {
   container.innerHTML = `
     <div class="comments-section">
       <h2 class="episodes-title">B\u00ecnh lu\u1eadn</h2>
+      <div class="comment-feedback" id="comment-feedback" aria-live="polite"></div>
       <div class="comment-form-area" id="comment-form-area"></div>
       <div class="comment-list" id="comment-list">
         <div class="comment-loading">\u0110ang t\u1ea3i b\u00ecnh lu\u1eadn...</div>
@@ -85,12 +86,31 @@ export function renderComments(container, slug) {
 
   const formArea = container.querySelector('#comment-form-area');
   const listEl = container.querySelector('#comment-list');
+  const feedbackEl = container.querySelector('#comment-feedback');
+  let pendingDeleteId = null;
+  let feedbackTimeout = null;
+
+  function showFeedback(message, type = 'info') {
+    if (!feedbackEl) return;
+    clearTimeout(feedbackTimeout);
+    feedbackEl.textContent = message;
+    feedbackEl.classList.remove('show', 'info', 'success', 'error');
+
+    if (!message) return;
+
+    feedbackEl.classList.add('show', type);
+    feedbackTimeout = setTimeout(() => {
+      feedbackEl.classList.remove('show', 'info', 'success', 'error');
+      feedbackEl.textContent = '';
+    }, 3200);
+  }
 
   async function loadComments() {
     try {
       const comments = await fetchComments(slug);
 
       if (comments.length === 0) {
+        pendingDeleteId = null;
         listEl.innerHTML = `
           <div class="comment-empty">
             <span>\ud83d\udcac</span>
@@ -101,6 +121,7 @@ export function renderComments(container, slug) {
       }
 
       const currentUid = getUser()?.uid;
+      pendingDeleteId = null;
       listEl.innerHTML = comments.map(c => {
         const time = c.createdAt ? formatTime(c.createdAt) : 'V\u1eeba xong';
         const initial = (c.displayName || '?').charAt(0).toUpperCase();
@@ -126,19 +147,33 @@ export function renderComments(container, slug) {
       listEl.querySelectorAll('.comment-delete').forEach(btn => {
         btn.addEventListener('click', async () => {
           const docId = btn.dataset.docId;
-          if (confirm('X\u00f3a b\u00ecnh lu\u1eadn n\u00e0y?')) {
-            try {
-              await removeComment(slug, docId);
-              await loadComments();
-            } catch (err) {
-              console.error('Delete comment error:', err);
-            }
+
+          if (pendingDeleteId !== docId) {
+            pendingDeleteId = docId;
+            listEl.querySelectorAll('.comment-delete').forEach(actionBtn => {
+              const isTarget = actionBtn.dataset.docId === docId;
+              actionBtn.classList.toggle('confirming', isTarget);
+              actionBtn.textContent = isTarget ? 'Xác nhận' : '✕';
+              actionBtn.setAttribute('title', isTarget ? 'Nhấn lần nữa để xác nhận xoá' : 'Xoá');
+            });
+            showFeedback('Nhấn lại vào "Xác nhận" để xoá bình luận.', 'info');
+            return;
+          }
+
+          try {
+            await removeComment(slug, docId);
+            showFeedback('Đã xoá bình luận.', 'success');
+            await loadComments();
+          } catch (err) {
+            console.error('Delete comment error:', err);
+            showFeedback('Không thể xoá bình luận. Vui lòng thử lại.', 'error');
           }
         });
       });
     } catch (err) {
       console.error('Load comments error:', err);
       listEl.innerHTML = `<div class="comment-empty"><p>L\u1ed7i t\u1ea3i b\u00ecnh lu\u1eadn</p></div>`;
+      showFeedback('Không thể tải bình luận. Vui lòng thử lại sau.', 'error');
     }
   }
 
@@ -182,12 +217,13 @@ export function renderComments(container, slug) {
             photoURL: user.photoURL || '',
             text,
           });
+          showFeedback('Bình luận đã được gửi.', 'success');
           await loadComments();
         } catch (err) {
           console.error('Comment send error:', err);
           input.value = text;
           sendBtn.disabled = false;
-          alert('G\u1eedi b\u00ecnh lu\u1eadn th\u1ea5t b\u1ea1i: ' + err.message);
+          showFeedback(`Gửi bình luận thất bại: ${err.message}`, 'error');
         }
       };
 
@@ -215,6 +251,7 @@ export function renderComments(container, slug) {
   loadComments();
 
   return () => {
+    clearTimeout(feedbackTimeout);
     unsubAuth();
   };
 }

@@ -8,6 +8,8 @@ import { renderDetailPage } from './pages/detail.js';
 import { renderWatchPage } from './pages/watch.js';
 import { renderSearchPage } from './pages/search.js';
 import { renderAnimePage } from './pages/anime.js';
+import { renderPrivacyPage } from './pages/privacy.js';
+import { renderTermsPage } from './pages/terms.js';
 
 // Initialize components
 renderNavbar();
@@ -21,6 +23,8 @@ addRoute('/watch/:slug/:ep', renderWatchPage);
 addRoute('/search', () => renderSearchPage({ keyword: '' }));
 addRoute('/search/:keyword', renderSearchPage);
 addRoute('/category/:category', (params) => renderAnimePage(params));
+addRoute('/privacy', renderPrivacyPage);
+addRoute('/terms', renderTermsPage);
 
 // Start router
 initRouter();
