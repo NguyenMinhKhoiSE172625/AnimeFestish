@@ -1,32 +1,25 @@
 // === Multi-Source Anime API Layer ===
-// Sources: KKPhim (phimapi.com) + OPhim (ophim1.com) + NguonC (phim.nguonc.com)
-// KKPhim + OPhim use compatible formats; NguonC uses a different format and is adapted
+// Sources: KKPhim (phimapi.com) + NguonC (phim.nguonc.com)
 
 // === M3U8 Ad-Cleaning Proxy ===
 const M3U8_PROXY_BASE = 'https://openapiphim.pathhubphim.workers.dev';
 
 // === WebP Image Conversion ===
-const WEBP_PROXY = '/api2/image.php';
+const WEBP_PROXY = 'https://phimapi.com/image.php';
 
 const SOURCES_OPHIM = [
   {
     name: 'PhimAPI',
-    base: '/api2', // proxied to phimapi.com (KKPhim)
+    base: 'https://phimapi.com',
     imgCdn: 'https://phimimg.com/',
-    type: 'ophim',
-  },
-  {
-    name: 'OPhim',
-    base: '/api',  // proxied to ophim1.com
-    imgCdn: 'https://img.ophim.live/uploads/movies/',
     type: 'ophim',
   },
 ];
 
 const SOURCE_NGUONC = {
   name: 'NguonC',
-  base: '/api3', // proxied to phim.nguonc.com
-  imgCdn: '', // NguonC returns full URLs
+  base: 'https://phim.nguonc.com',
+  imgCdn: '',
   type: 'nguonc',
 };
 

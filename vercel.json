@@ -1,21 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/api3/:path*",
-      "destination": "https://phim.nguonc.com/:path*"
-    },
-    {
-      "source": "/api2/:path*",
-      "destination": "https://phimapi.com/:path*"
-    },
-    {
-      "source": "/api/:path*",
-      "destination": "https://ophim1.com/:path*"
-    },
-    {
       "source": "/((?!api|api2|api3).*)",
       "destination": "/index.html"
     }
   ]
 }
-
