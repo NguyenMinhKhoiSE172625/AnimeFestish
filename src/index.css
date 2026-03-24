@@ -3293,7 +3293,8 @@ textarea:focus-visible {
   padding-top: calc(var(--navbar-h) + 40px);
 }
 
-#main-content:has(.hero) {
+#main-content:has(.hero),
+#main-content:has(.detail-backdrop) {
   padding-top: 0;
 }
 
@@ -3342,7 +3343,7 @@ textarea:focus-visible {
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   border-image: none;
-  border-color: rgba(255, 45, 120, 0.32);
+  border-color: rgba(255, 45, 120, 0.1);
   box-shadow: 0 24px 54px rgba(5, 10, 18, 0.52);
 }
 
@@ -4190,7 +4191,8 @@ textarea:focus-visible {
     padding-top: calc(var(--navbar-h) + 30px);
   }
 
-  #main-content:has(.hero) {
+  #main-content:has(.hero),
+  #main-content:has(.detail-backdrop) {
     padding-top: 0;
   }
 
@@ -4316,7 +4318,8 @@ textarea:focus-visible {
     padding-top: calc(var(--navbar-h) + 20px);
   }
 
-  #main-content:has(.hero) {
+  #main-content:has(.hero),
+  #main-content:has(.detail-backdrop) {
     padding-top: 0;
   }
 

@@ -188,19 +188,13 @@ export async function renderDetailPage({ slug }) {
       });
     }
 
-    // Progressive enhancement: try Kitsu for better poster images
+    // Progressive enhancement: try Kitsu for better poster image only
     const originName = movie.origin_name;
     if (originName) {
       fetchKitsuPoster(originName).then(kitsu => {
-        if (!kitsu) return;
-        if (kitsu.poster) {
-          const posterEl = main.querySelector('.detail-poster img');
-          if (posterEl) posterEl.src = kitsu.poster;
-        }
-        if (kitsu.cover || kitsu.poster) {
-          const backdropEl = main.querySelector('.detail-backdrop img');
-          if (backdropEl) backdropEl.src = kitsu.cover || kitsu.poster;
-        }
+        if (!kitsu || !kitsu.poster) return;
+        const posterEl = main.querySelector('.detail-poster img');
+        if (posterEl) posterEl.src = kitsu.poster;
       });
     }
 
