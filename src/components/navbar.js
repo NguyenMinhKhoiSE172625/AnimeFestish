@@ -2,9 +2,13 @@
 import { navigate } from '../js/router.js';
 import { onUserChange, logout } from '../js/auth.js';
 import { renderLoginPopup } from './loginPopup.js';
+import { searchAnime, getImageUrl, toWebpUrl } from '../js/api.js';
+import { filterAnimeOnly } from '../js/animeFilter.js';
 
 let mobileOpen = false;
 let searchOpen = false;
+let suggestTimeout = null;
+let suggestFocusIdx = -1;
 
 export function renderNavbar() {
   const navbar = document.getElementById('navbar');
@@ -21,7 +25,8 @@ export function renderNavbar() {
         <div class="navbar-links" id="nav-links">
           <div class="mobile-search-bar">
             <svg class="mobile-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-            <input type="text" class="mobile-search-input" id="mobile-search-input" placeholder="Tìm anime..." />
+            <input type="text" class="mobile-search-input" id="mobile-search-input" placeholder="Tìm anime..." autocomplete="off" />
+            <div class="search-suggestions mobile-search-suggestions" id="mobile-search-suggestions"></div>
           </div>
           <a href="/" class="nav-link" data-route="/">Trang chủ</a>
           <a href="/anime" class="nav-link" data-route="/anime">Anime</a>
@@ -32,7 +37,8 @@ export function renderNavbar() {
         <div class="navbar-actions">
           <div class="navbar-search" id="nav-search">
             <button class="navbar-search-btn" id="search-toggle" aria-label="Mở tìm kiếm" aria-expanded="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></button>
-            <input type="text" placeholder="Tìm anime..." id="search-input" aria-label="Tìm kiếm anime" />
+            <input type="text" placeholder="Tìm anime..." id="search-input" aria-label="Tìm kiếm anime" autocomplete="off" />
+            <div class="search-suggestions" id="search-suggestions"></div>
           </div>
           <div class="auth-area" id="auth-area">
             <button class="btn-login" id="login-btn">Đăng nhập</button>
@@ -68,21 +74,20 @@ export function renderNavbar() {
   const searchContainer = document.getElementById('nav-search');
   const searchInput = document.getElementById('search-input');
   const searchToggle = document.getElementById('search-toggle');
+  const suggestBox = document.getElementById('search-suggestions');
   searchToggle.addEventListener('click', () => {
     searchOpen = !searchOpen;
     searchContainer.classList.toggle('open', searchOpen);
     searchToggle.setAttribute('aria-expanded', String(searchOpen));
     if (searchOpen) searchInput.focus();
+    if (!searchOpen) hideSuggestions(suggestBox);
   });
 
-  // Search submit
-  searchInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && searchInput.value.trim()) {
-      navigate(`/search/${encodeURIComponent(searchInput.value.trim())}`);
-      searchInput.value = '';
-      searchOpen = false;
-      searchContainer.classList.remove('open');
-    }
+  // Desktop search autocomplete
+  setupSearchAutocomplete(searchInput, suggestBox, () => {
+    searchInput.value = '';
+    searchOpen = false;
+    searchContainer.classList.remove('open');
   });
 
   // Mobile menu
@@ -127,6 +132,7 @@ export function renderNavbar() {
       searchOpen = false;
       searchContainer.classList.remove('open');
       searchToggle.setAttribute('aria-expanded', 'false');
+      hideSuggestions(suggestBox);
     }
   });
 
@@ -207,17 +213,25 @@ export function renderNavbar() {
     closeMobileMenu();
   });
 
-  // Mobile search input
+  // Mobile search input with autocomplete
   const mobileSearchInput = document.getElementById('mobile-search-input');
-  if (mobileSearchInput) {
-    mobileSearchInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && mobileSearchInput.value.trim()) {
-        navigate(`/search/${encodeURIComponent(mobileSearchInput.value.trim())}`);
-        mobileSearchInput.value = '';
-        closeMobileMenu();
-      }
+  const mobileSuggestBox = document.getElementById('mobile-search-suggestions');
+  if (mobileSearchInput && mobileSuggestBox) {
+    setupSearchAutocomplete(mobileSearchInput, mobileSuggestBox, () => {
+      mobileSearchInput.value = '';
+      closeMobileMenu();
     });
   }
+
+  // Close suggestions when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!searchContainer.contains(e.target)) {
+      hideSuggestions(suggestBox);
+    }
+    if (mobileSuggestBox && mobileSearchInput && !mobileSearchInput.parentElement.contains(e.target)) {
+      hideSuggestions(mobileSuggestBox);
+    }
+  });
 }
 
 function updateActiveLink() {
@@ -248,6 +262,144 @@ function updateActiveLink() {
       item.setAttribute('aria-current', 'page');
     } else {
       item.removeAttribute('aria-current');
+    }
+  });
+}
+
+// === Search Autocomplete Helpers ===
+
+function resolveSuggestImg(item) {
+  const file = item.thumb_url || item.poster_url;
+  if (!file) return '';
+  if (file.startsWith('http')) return toWebpUrl(file);
+  if (item._imgCdn) return toWebpUrl(`${item._imgCdn}${file}`);
+  return getImageUrl(file);
+}
+
+function hideSuggestions(box) {
+  if (box) {
+    box.classList.remove('active');
+    box.innerHTML = '';
+  }
+  suggestFocusIdx = -1;
+}
+
+function setupSearchAutocomplete(input, suggestBox, onNavigate) {
+  let abortCtrl = null;
+
+  input.addEventListener('input', () => {
+    clearTimeout(suggestTimeout);
+    const q = input.value.trim();
+
+    if (q.length < 2) {
+      hideSuggestions(suggestBox);
+      return;
+    }
+
+    suggestBox.innerHTML = '<div class="search-suggest-loading">Đang tìm...</div>';
+    suggestBox.classList.add('active');
+
+    suggestTimeout = setTimeout(async () => {
+      if (abortCtrl) abortCtrl.abort();
+      abortCtrl = new AbortController();
+
+      try {
+        const data = await searchAnime(q, 1);
+        const rawItems = data.items || [];
+        const items = filterAnimeOnly(rawItems).slice(0, 8);
+
+        if (input.value.trim() !== q) return;
+
+        if (items.length === 0) {
+          suggestBox.innerHTML = '<div class="search-suggest-empty">Không tìm thấy anime nào</div>';
+          return;
+        }
+
+        suggestFocusIdx = -1;
+        suggestBox.innerHTML = items.map((item, i) => {
+          const img = resolveSuggestImg(item);
+          const meta = [item.year, item.quality, item.episode_current].filter(Boolean).join(' • ');
+          return `
+            <div class="search-suggest-item" data-slug="${item.slug}" data-index="${i}">
+              <img src="${img}" alt="${item.name}" loading="lazy" onerror="this.style.display='none'" />
+              <div class="search-suggest-info">
+                <div class="search-suggest-title">${item.name}</div>
+                ${meta ? `<div class="search-suggest-meta">${meta}</div>` : ''}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        suggestBox.innerHTML += `<div class="search-suggest-viewall" data-query="${q}">Xem tất cả kết quả →</div>`;
+
+        suggestBox.querySelectorAll('.search-suggest-item').forEach(el => {
+          el.addEventListener('click', () => {
+            navigate(`/anime/${el.dataset.slug}`);
+            hideSuggestions(suggestBox);
+            onNavigate();
+          });
+        });
+
+        suggestBox.querySelector('.search-suggest-viewall')?.addEventListener('click', () => {
+          navigate(`/search/${encodeURIComponent(q)}`);
+          hideSuggestions(suggestBox);
+          onNavigate();
+        });
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          suggestBox.innerHTML = '<div class="search-suggest-empty">Lỗi tìm kiếm</div>';
+        }
+      }
+    }, 300);
+  });
+
+  input.addEventListener('keydown', (e) => {
+    const items = suggestBox.querySelectorAll('.search-suggest-item');
+    if (!items.length) {
+      if (e.key === 'Enter' && input.value.trim()) {
+        navigate(`/search/${encodeURIComponent(input.value.trim())}`);
+        hideSuggestions(suggestBox);
+        onNavigate();
+      }
+      return;
+    }
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      suggestFocusIdx = Math.min(suggestFocusIdx + 1, items.length - 1);
+      updateFocus(items);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      suggestFocusIdx = Math.max(suggestFocusIdx - 1, -1);
+      updateFocus(items);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (suggestFocusIdx >= 0 && items[suggestFocusIdx]) {
+        navigate(`/anime/${items[suggestFocusIdx].dataset.slug}`);
+        hideSuggestions(suggestBox);
+        onNavigate();
+      } else if (input.value.trim()) {
+        navigate(`/search/${encodeURIComponent(input.value.trim())}`);
+        hideSuggestions(suggestBox);
+        onNavigate();
+      }
+    } else if (e.key === 'Escape') {
+      hideSuggestions(suggestBox);
+    }
+  });
+
+  input.addEventListener('focus', () => {
+    if (input.value.trim().length >= 2 && suggestBox.children.length > 0) {
+      suggestBox.classList.add('active');
+    }
+  });
+}
+
+function updateFocus(items) {
+  items.forEach((el, i) => {
+    el.classList.toggle('focused', i === suggestFocusIdx);
+    if (i === suggestFocusIdx) {
+      el.scrollIntoView({ block: 'nearest' });
     }
   });
 }
