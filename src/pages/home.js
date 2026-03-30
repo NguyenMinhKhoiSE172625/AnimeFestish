@@ -60,7 +60,7 @@ export async function renderHomePage() {
   content.innerHTML = '';
   const newest = allJapanAnime.slice(0, 24);
   if (newest.length > 0) {
-    renderAnimeRow(content, 'Mới Cập Nhật 🔥', newest, '/anime');
+    renderAnimeRow(content, 'Mới Cập Nhật', newest, '/anime');
   }
 
   // Top 10 (background, doesn't block)
@@ -68,10 +68,10 @@ export async function renderHomePage() {
   content.appendChild(top10Container);
   Promise.allSettled([fetchTopAnimeMovies(10), fetchTopAnimeSeries(10)]).then(([moviesR, seriesR]) => {
     if (moviesR.status === 'fulfilled' && moviesR.value.length > 0) {
-      renderTop10Row(top10Container, 'Top Anime Movie 🎬', moviesR.value);
+      renderTop10Row(top10Container, 'Top Anime Movie', moviesR.value);
     }
     if (seriesR.status === 'fulfilled' && seriesR.value.length > 0) {
-      renderTop10Row(top10Container, 'Top Anime Bộ 📺', seriesR.value);
+      renderTop10Row(top10Container, 'Top Anime Bộ', seriesR.value);
     }
   });
 
@@ -85,10 +85,10 @@ export async function renderHomePage() {
   };
 
   const rows = [
-    { title: 'Hành Động ⚔️', items: filterJP(actionResult), link: '/category/hanh-dong' },
-    { title: 'Tình Cảm 💕', items: filterJP(romanceResult), link: '/category/tinh-cam' },
-    { title: 'Viễn Tưởng 🌌', items: filterJP(fantasyResult), link: '/category/vien-tuong' },
-    { title: 'Bí Ẩn 🔮', items: filterJP(mysteryResult), link: '/category/bi-an' },
+    { title: 'Hành Động', items: filterJP(actionResult), link: '/category/hanh-dong' },
+    { title: 'Tình Cảm', items: filterJP(romanceResult), link: '/category/tinh-cam' },
+    { title: 'Viễn Tưởng', items: filterJP(fantasyResult), link: '/category/vien-tuong' },
+    { title: 'Bí Ẩn', items: filterJP(mysteryResult), link: '/category/bi-an' },
   ];
 
   for (const row of rows) {

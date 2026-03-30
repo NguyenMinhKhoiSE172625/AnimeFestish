@@ -113,7 +113,7 @@ export function renderComments(container, slug) {
         pendingDeleteId = null;
         listEl.innerHTML = `
           <div class="comment-empty">
-            <span>\ud83d\udcac</span>
+            <span><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
             <p>Ch\u01b0a c\u00f3 b\u00ecnh lu\u1eadn n\u00e0o. H\u00e3y l\u00e0 ng\u01b0\u1eddi \u0111\u1ea7u ti\u00ean!</p>
           </div>
         `;

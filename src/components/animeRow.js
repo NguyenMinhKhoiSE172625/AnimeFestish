@@ -20,8 +20,10 @@ export function renderAnimeRow(container, title, items, moreLink = null) {
   const scrollContainer = section.querySelector('.anime-row-scroll');
 
   if (items && items.length > 0) {
-    items.forEach(item => {
-      scrollContainer.appendChild(createAnimeCard(item));
+    items.forEach((item, i) => {
+      const card = createAnimeCard(item);
+      card.style.setProperty('--index', i);
+      scrollContainer.appendChild(card);
     });
   }
 

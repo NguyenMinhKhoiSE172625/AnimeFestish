@@ -3,68 +3,7 @@
    Design System & Global Styles
    ============================================ */
 
-/* === CSS Variables === */
-:root {
-  /* Background */
-  --bg-primary: #0b0d14;
-  --bg-secondary: #111827;
-  --bg-card: rgba(17, 24, 39, 0.8);
-  --bg-card-hover: rgba(30, 41, 59, 0.9);
-  --bg-glass: rgba(15, 23, 42, 0.85);
-  --bg-navbar: rgba(11, 13, 20, 0.88);
-
-  /* Accent — Purple/Blue/Pink anime aesthetic */
-  --accent-primary: #8b5cf6;
-  --accent-secondary: #a78bfa;
-  --accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #ec4899 50%, #06b6d4 100%);
-  --accent-gradient-reverse: linear-gradient(135deg, #06b6d4 0%, #ec4899 50%, #8b5cf6 100%);
-  --accent-glow: 0 0 20px rgba(139, 92, 246, 0.4);
-  --accent-glow-sm: 0 0 10px rgba(139, 92, 246, 0.25);
-
-  /* Text */
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --text-accent: #a78bfa;
-
-  /* Borders */
-  --border-color: rgba(139, 92, 246, 0.12);
-  --border-hover: rgba(139, 92, 246, 0.3);
-  --border-glow: rgba(139, 92, 246, 0.4);
-
-  /* Status */
-  --success: #10b981;
-  --warning: #f59e0b;
-  --info: #06b6d4;
-
-  /* Spacing */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 32px;
-  --space-2xl: 48px;
-  --space-3xl: 64px;
-
-  /* Layout */
-  --content-max: 1400px;
-  --navbar-h: 64px;
-  --card-radius: 10px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
-
-  /* Transitions */
-  --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --duration-fast: 150ms;
-  --duration-normal: 300ms;
-  --duration-slow: 500ms;
-
-  /* Shadows */
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4), 0 0 12px rgba(139, 92, 246, 0.06);
-  --shadow-card-hover: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(139, 92, 246, 0.15);
-  --shadow-hero: 0 0 80px rgba(139, 92, 246, 0.15);
-}
+/* === CSS Variables (defined in Premium Redesign section below) === */
 
 /* === Reset & Base === */
 *,
@@ -507,7 +446,7 @@ input {
 .hero-title {
   font-size: clamp(1.4rem, 3vw, 2.2rem);
   font-weight: 800;
-  line-height: 1.15;
+  line-height: 1.32;
   margin-bottom: var(--space-sm);
   text-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
   animation: fadeInUp 0.6s 0.1s var(--ease-out) both;
@@ -596,7 +535,6 @@ input {
   background: rgba(139, 92, 246, 0.08);
   color: #fff;
   border: 1px solid rgba(139, 92, 246, 0.3);
-  backdrop-filter: blur(10px);
 }
 
 .btn-outline:hover {
@@ -851,8 +789,6 @@ input {
   font-weight: 600;
   background: rgba(15, 23, 42, 0.8);
   color: var(--accent-secondary);
-  backdrop-filter: blur(4px);
-  border: 1px solid var(--border-color);
 }
 
 .anime-card-info {
@@ -1172,7 +1108,6 @@ input {
   border: 1px solid rgba(139, 92, 246, 0.15);
   color: var(--text-secondary);
   font-size: 0.8rem;
-  backdrop-filter: blur(4px);
 }
 
 .detail-desc {
@@ -1271,7 +1206,6 @@ input {
   text-align: center;
   cursor: pointer;
   transition: all var(--duration-fast) var(--ease-out);
-  backdrop-filter: blur(4px);
 }
 
 .episode-btn:hover {
@@ -1358,7 +1292,6 @@ input {
   font-weight: 500;
   cursor: pointer;
   transition: all var(--duration-fast);
-  backdrop-filter: blur(4px);
 }
 
 .server-tab.active {
@@ -1389,7 +1322,6 @@ input {
   color: var(--text-primary);
   font-size: 1.05rem;
   transition: border-color var(--duration-normal), box-shadow var(--duration-normal);
-  backdrop-filter: blur(4px);
 }
 
 .search-bar-lg input:focus {
@@ -1445,7 +1377,6 @@ input {
   font-size: 0.82rem;
   cursor: pointer;
   transition: all var(--duration-fast);
-  backdrop-filter: blur(4px);
 }
 
 .filter-chip.active,
@@ -1480,7 +1411,6 @@ input {
   justify-content: center;
   cursor: pointer;
   transition: all var(--duration-fast);
-  backdrop-filter: blur(4px);
 }
 
 .page-btn:hover {
@@ -2040,10 +1970,6 @@ input {
 }
 
 @media (max-width: 768px) {
-  :root {
-    --navbar-h: 56px;
-  }
-
   .navbar-links {
     display: none;
   }
@@ -2381,7 +2307,7 @@ input {
 
   .hero-title {
     font-size: 1.15rem;
-    line-height: 1.2;
+    line-height: 1.3;
     margin-bottom: var(--space-xs);
   }
 
@@ -3142,6 +3068,7 @@ input {
 
 /* === Premium Redesign Overrides (2026) === */
 :root {
+  /* Backgrounds */
   --bg-primary: #0f141c;
   --bg-secondary: #141b24;
   --bg-card: rgba(18, 25, 35, 0.88);
@@ -3149,6 +3076,7 @@ input {
   --bg-glass: rgba(12, 18, 28, 0.9);
   --bg-navbar: rgba(12, 19, 30, 0.82);
 
+  /* Accent */
   --accent-primary: #ff2d78;
   --accent-secondary: #ff6ba8;
   --accent-gradient: linear-gradient(135deg, #ff6ba8 0%, #ff2d78 45%, #d4237a 100%);
@@ -3156,33 +3084,55 @@ input {
   --accent-glow: 0 0 28px rgba(255, 45, 120, 0.26);
   --accent-glow-sm: 0 0 14px rgba(255, 45, 120, 0.22);
 
+  /* Text */
   --text-primary: #f3eee4;
   --text-secondary: #cbc3b2;
   --text-muted: #948c7f;
   --text-accent: #ff8ec4;
 
+  /* Borders */
   --border-color: rgba(255, 45, 120, 0.16);
   --border-hover: rgba(255, 45, 120, 0.34);
   --border-glow: rgba(255, 45, 120, 0.42);
 
+  /* Status */
   --success: #52c092;
   --warning: #efb768;
   --info: #8fc4cc;
 
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
+  /* Layout */
   --content-max: 1360px;
   --navbar-h: 68px;
   --card-radius: 16px;
   --radius-lg: 20px;
   --radius-xl: 28px;
 
+  /* Transitions */
+  --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-premium: cubic-bezier(0.32, 0.72, 0, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+
+  /* Shadows */
   --shadow-card: 0 12px 38px rgba(5, 10, 18, 0.46), 0 0 0 1px rgba(255, 45, 120, 0.08);
   --shadow-card-hover: 0 24px 58px rgba(5, 10, 18, 0.58), 0 14px 36px rgba(255, 45, 120, 0.14);
   --shadow-hero: 0 32px 90px rgba(255, 45, 120, 0.18);
 
+  /* Typography */
   --font-body: "Be Vietnam Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-display: "Playfair Display", Georgia, serif;
   --focus-ring: 0 0 0 3px rgba(255, 45, 120, 0.34);
-  --ease-premium: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 html {
@@ -3832,7 +3782,7 @@ textarea:focus-visible {
 
 .hero-title {
   font-size: clamp(1.6rem, 4.4vw, 2.6rem);
-  line-height: 1.12;
+  line-height: 1.32;
   letter-spacing: -0.025em;
   text-shadow: 0 8px 32px rgba(0, 0, 0, 0.48);
 }
@@ -4065,7 +4015,11 @@ textarea:focus-visible {
 }
 
 .category-filters {
-  gap: 10px;
+  gap: 10px 12px;
+}
+
+.filter-chip {
+  padding: 8px 20px;
 }
 
 .watch-container,
@@ -4338,13 +4292,22 @@ textarea:focus-visible {
 
   .navbar {
     top: 8px;
-    width: calc(100% - 1rem);
+    left: 0.5rem;
+    right: 0.5rem;
+    width: auto;
     height: var(--navbar-h);
     border-radius: 18px;
+    transform: none; /* CRITICAL: remove transform so position:fixed works on mobile menu children */
   }
 
   .navbar.scrolled {
     top: 6px;
+    /* Use solid bg instead of backdrop-filter on mobile.
+       backdrop-filter creates a containing block that traps
+       position:fixed children (mobile menu) inside the navbar. */
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(12, 19, 30, 0.98);
   }
 
   .navbar-inner {
@@ -4408,16 +4371,25 @@ textarea:focus-visible {
   }
 
   .navbar-links.mobile-open {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    flex-wrap: nowrap;
     top: calc(var(--navbar-h) + 10px);
     left: 0.5rem;
     right: 0.5rem;
     bottom: calc(56px + env(safe-area-inset-bottom, 0) + 8px);
     width: auto;
+    padding: var(--space-lg);
+    gap: var(--space-sm);
     border-radius: 20px;
     border: 1px solid rgba(255, 45, 120, 0.22);
     box-shadow: 0 26px 62px rgba(5, 10, 18, 0.56);
-    background: rgba(11, 17, 25, 0.94);
+    background: rgba(11, 17, 25, 0.97);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     overflow-x: hidden;
+    overflow-y: auto;
     scrollbar-width: none;
   }
 
@@ -4425,6 +4397,25 @@ textarea:focus-visible {
     width: 0;
     height: 0;
     display: none;
+  }
+
+  .navbar-links.mobile-open a {
+    display: block;
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    color: var(--text-primary);
+    text-align: left;
+  }
+
+  .navbar-links.mobile-open a.active {
+    background: rgba(255, 45, 120, 0.14);
+    color: var(--text-accent);
+  }
+
+  .navbar-links.mobile-open a:active {
+    background: rgba(255, 255, 255, 0.06);
   }
 
   .mobile-backdrop {
@@ -4557,7 +4548,253 @@ textarea:focus-visible {
     grid-template-columns: 1fr;
   }
 
-  .comment-feedback {
-    font-size: 0.76rem;
-  }
+.comment-feedback {
+  font-size: 0.76rem;
+}
+}
+
+/* ============================================
+   Premium Polish (Tong Mon Overhaul)
+   ============================================ */
+
+/* --- Page Transitions --- */
+#main-content {
+  transition: opacity 0.15s var(--ease-premium);
+}
+
+.page-leaving {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.page-entering {
+  animation: pageEnter 0.35s var(--ease-premium) backwards;
+}
+
+@keyframes pageEnter {
+  from { opacity: 0; }
+}
+
+/* --- Staggered Card Reveal --- */
+/* ONLY animate opacity — never touch transform here, it conflicts with hover transitions */
+.anime-row-scroll > .anime-card,
+.anime-row-scroll > .top10-card,
+.anime-grid > .anime-card {
+  animation: cardFadeIn 0.35s var(--ease-premium) backwards;
+  animation-delay: calc(var(--index, 0) * 50ms);
+}
+
+@keyframes cardFadeIn {
+  from { opacity: 0; }
+}
+
+/* Cap max delay so late cards don't feel frozen */
+.anime-grid > .anime-card {
+  animation-delay: calc(min(var(--index, 0), 20) * 40ms);
+}
+
+/* --- Ambient Background Blob --- */
+@keyframes ambientDrift {
+  0%   { transform: translate(0, 0) scale(1); }
+  33%  { transform: translate(40px, -30px) scale(1.05); }
+  66%  { transform: translate(-20px, 20px) scale(0.97); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+body::before {
+  animation: ambientDrift 28s ease-in-out infinite;
+}
+
+/* --- Card Inner Highlight & Tinted Shadow --- */
+.anime-card-poster {
+  box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.anime-card:hover .anime-card-poster {
+  box-shadow: var(--shadow-card-hover), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.top10-poster {
+  box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.top10-card:hover .top10-poster {
+  box-shadow: var(--shadow-card-hover), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.player-wrapper {
+  box-shadow: var(--shadow-card-hover), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.detail-poster {
+  box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* --- Active/Pressed States (Tactile Feedback) --- */
+.episode-btn:active,
+.filter-chip:active,
+.page-btn:active,
+.server-tab:active {
+  transform: translateY(1px) scale(0.97);
+  transition-duration: 80ms;
+}
+
+.detail-cat:active {
+  transform: scale(0.96);
+  transition-duration: 80ms;
+}
+
+.section-more:active {
+  transform: translateY(1px);
+}
+
+.footer-links a:active {
+  transform: translateY(1px) scale(0.97);
+  transition-duration: 80ms;
+}
+
+.bottom-nav-item:active {
+  transform: scale(0.92);
+  transition-duration: 80ms;
+}
+
+.profile-selector:active {
+  transform: scale(0.96);
+  transition-duration: 80ms;
+}
+
+.navbar-mobile-btn:active {
+  transform: scale(0.9);
+  transition-duration: 80ms;
+}
+
+.navbar-search-btn:active {
+  transform: translateY(-50%) scale(0.88);
+  transition-duration: 80ms;
+}
+
+.comment-send:active:not(:disabled) {
+  transform: translateY(1px) scale(0.97);
+  transition-duration: 80ms;
+}
+
+.login-submit:active:not(:disabled) {
+  transform: translateY(1px) scale(0.98);
+  transition-duration: 80ms;
+}
+
+.login-google:active {
+  transform: translateY(1px) scale(0.98);
+  transition-duration: 80ms;
+}
+
+.search-suggest-item:active {
+  transform: scale(0.98);
+  transition-duration: 80ms;
+}
+
+/* --- Hero Slide Transition Upgrade --- */
+.hero-slide {
+  transition: opacity 0.9s var(--ease-premium);
+}
+
+.hero-slide .hero-slide-bg {
+  transition: transform 6.5s ease-out, opacity 0.9s var(--ease-premium);
+  transform: scale(1.04);
+}
+
+.hero-slide.active .hero-slide-bg {
+  transform: scale(1);
+}
+
+/* --- Tabular Nums Everywhere --- */
+.detail-meta-tag,
+.badge-ep,
+.anime-card-sub,
+.episode-btn,
+.page-btn,
+.comment-time,
+.footer-copy,
+.hero-meta,
+.watch-ep-title,
+.search-results-info,
+.search-suggest-meta {
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Letter-Spacing Tuning --- */
+.hero-badge,
+.anime-card-badge,
+.policy-kicker {
+  letter-spacing: 0.1em;
+}
+
+.section-title,
+.category-title,
+.detail-title,
+.episodes-title,
+.watch-title {
+  letter-spacing: -0.02em;
+}
+
+.anime-card-title,
+.search-suggest-title {
+  letter-spacing: -0.01em;
+}
+
+.footer-copy,
+.comment-time,
+.search-results-info {
+  letter-spacing: 0.02em;
+}
+
+/* --- Empty State SVG polish --- */
+.empty-state-icon svg {
+  color: var(--text-muted);
+  margin: 0 auto;
+  display: block;
+}
+
+/* --- Detail Meta Tag icon alignment --- */
+.detail-meta-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.detail-meta-tag svg {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+/* --- Button icon alignment --- */
+.btn svg {
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.hero-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.hero-meta-item svg {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.hero-rating svg {
+  flex-shrink: 0;
+}
+
+/* --- Profile Item icon alignment --- */
+.profile-item svg {
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+/* --- Scroll Row smooth fade-in after content loads --- */
+.anime-row-scroll {
+  min-height: 0;
 }

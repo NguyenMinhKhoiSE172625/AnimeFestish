@@ -20,7 +20,7 @@ export function createAnimeCard(item) {
   card.innerHTML = `
     <div class="anime-card-poster">
       <img src="${posterUrl}" alt="${item.name}" loading="lazy" 
-           onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 300%22><rect fill=%22%231a1a2e%22 width=%22200%22 height=%22300%22/><text fill=%22%236b6b7b%22 x=%22100%22 y=%22150%22 font-size=%2214%22 text-anchor=%22middle%22>No Image</text></svg>'" />
+           onerror="this.onerror=null;this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 300%22><rect fill=%22%231a1a2e%22 width=%22200%22 height=%22300%22/><text fill=%22%236b6b7b%22 x=%22100%22 y=%22150%22 font-size=%2214%22 text-anchor=%22middle%22>No Image</text></svg>'" />
       <div class="anime-card-badges">
         ${item.quality ? `<span class="anime-card-badge badge-quality">${item.quality}</span>` : ''}
         ${item.lang ? `<span class="anime-card-badge badge-lang">${item.lang === 'Vietsub' ? 'VS' : item.lang}</span>` : ''}

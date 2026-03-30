@@ -31,14 +31,14 @@ export async function renderAnimePage({ category }) {
     <div class="category-header">
       <h1 class="category-title">${title}</h1>
       <div class="category-filters">
-        <a href="/anime" class="filter-chip ${slug === 'anime' ? 'active' : ''}">📺 Tất cả</a>
-        <a href="/category/hanh-dong" class="filter-chip ${slug === 'hanh-dong' ? 'active' : ''}">⚔️ Hành Động</a>
-        <a href="/category/tinh-cam" class="filter-chip ${slug === 'tinh-cam' ? 'active' : ''}">💕 Tình Cảm</a>
-        <a href="/category/vien-tuong" class="filter-chip ${slug === 'vien-tuong' ? 'active' : ''}">🌌 Viễn Tưởng</a>
-        <a href="/category/phieu-luu" class="filter-chip ${slug === 'phieu-luu' ? 'active' : ''}">🗺️ Phiêu Lưu</a>
-        <a href="/category/hai-huoc" class="filter-chip ${slug === 'hai-huoc' ? 'active' : ''}">😂 Hài Hước</a>
-        <a href="/category/bi-an" class="filter-chip ${slug === 'bi-an' ? 'active' : ''}">🔮 Bí Ẩn</a>
-        <a href="/category/tam-ly" class="filter-chip ${slug === 'tam-ly' ? 'active' : ''}">🧠 Tâm Lý</a>
+        <a href="/anime" class="filter-chip ${slug === 'anime' ? 'active' : ''}">Tất cả</a>
+        <a href="/category/hanh-dong" class="filter-chip ${slug === 'hanh-dong' ? 'active' : ''}">Hành Động</a>
+        <a href="/category/tinh-cam" class="filter-chip ${slug === 'tinh-cam' ? 'active' : ''}">Tình Cảm</a>
+        <a href="/category/vien-tuong" class="filter-chip ${slug === 'vien-tuong' ? 'active' : ''}">Viễn Tưởng</a>
+        <a href="/category/phieu-luu" class="filter-chip ${slug === 'phieu-luu' ? 'active' : ''}">Phiêu Lưu</a>
+        <a href="/category/hai-huoc" class="filter-chip ${slug === 'hai-huoc' ? 'active' : ''}">Hài Hước</a>
+        <a href="/category/bi-an" class="filter-chip ${slug === 'bi-an' ? 'active' : ''}">Bí Ẩn</a>
+        <a href="/category/tam-ly" class="filter-chip ${slug === 'tam-ly' ? 'active' : ''}">Tâm Lý</a>
       </div>
     </div>
     <div class="section" style="padding-top:0">
@@ -151,8 +151,8 @@ async function loadPage(slug, isCountry, page) {
     if (items.length === 0) {
       grid.innerHTML = `
         <div class="empty-state" style="grid-column:1/-1">
-          <div class="empty-state-icon">😔</div>
-          <div class="empty-state-text">Không có anime nào trong mục này</div>
+          <div class="empty-state-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div>
+          <div class="empty-state-text">Kh\u00f4ng c\u00f3 anime n\u00e0o trong m\u1ee5c n\u00e0y</div>
         </div>
       `;
       // Show pagination to go back
@@ -167,8 +167,10 @@ async function loadPage(slug, isCountry, page) {
       return;
     }
 
-    items.forEach(item => {
-      grid.appendChild(createAnimeCard(item));
+    items.forEach((item, i) => {
+      const card = createAnimeCard(item);
+      card.style.setProperty('--index', i);
+      grid.appendChild(card);
     });
 
     // Pagination
@@ -185,8 +187,8 @@ async function loadPage(slug, isCountry, page) {
     console.error('Category page error:', err);
     grid.innerHTML = `
       <div class="empty-state" style="grid-column:1/-1">
-        <div class="empty-state-icon">⚠️</div>
-        <div class="empty-state-text">Lỗi tải dữ liệu: ${err.message}</div>
+        <div class="empty-state-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div class="empty-state-text">L\u1ed7i t\u1ea3i d\u1eef li\u1ec7u: ${err.message}</div>
       </div>
     `;
   }

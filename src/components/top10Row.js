@@ -33,6 +33,7 @@ export function renderTop10Row(container, title, items, moreLink = null) {
   items.slice(0, 10).forEach((item, index) => {
     const card = document.createElement('div');
     card.className = 'top10-card';
+    card.style.setProperty('--index', index);
     card.setAttribute('data-slug', item.slug);
 
     const posterUrl = resolveImg(item);
@@ -41,7 +42,7 @@ export function renderTop10Row(container, title, items, moreLink = null) {
       <div class="top10-rank">${index + 1}</div>
       <div class="top10-poster">
         <img src="${posterUrl}" alt="${item.name}" loading="lazy"
-             onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 300%22><rect fill=%22%231a1a2e%22 width=%22200%22 height=%22300%22/><text fill=%22%236b6b7b%22 x=%22100%22 y=%22150%22 font-size=%2214%22 text-anchor=%22middle%22>No Image</text></svg>'" />
+             onerror="this.onerror=null;this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 300%22><rect fill=%22%231a1a2e%22 width=%22200%22 height=%22300%22/><text fill=%22%236b6b7b%22 x=%22100%22 y=%22150%22 font-size=%2214%22 text-anchor=%22middle%22>No Image</text></svg>'" />
         <div class="anime-card-overlay">
           <div class="anime-card-play"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg></div>
         </div>

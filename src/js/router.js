@@ -61,18 +61,24 @@ export async function handleRouteChange() {
   const mainContent = document.getElementById('main-content');
 
   if (matched) {
+    // Fade out current content
+    mainContent.classList.add('page-leaving');
+    await new Promise(r => setTimeout(r, 150));
+    // Guard: if user navigated again during fade-out, abort this one
+    if (thisNav !== navId) return;
+    mainContent.classList.remove('page-leaving');
     window.scrollTo(0, 0);
-    mainContent.classList.add('fade-in');
+    mainContent.classList.add('page-entering');
     const cleanup = await matched.handler(matched.params);
     if (thisNav !== navId) return;
     currentCleanup = cleanup;
-    setTimeout(() => mainContent.classList.remove('fade-in'), 500);
+    setTimeout(() => mainContent.classList.remove('page-entering'), 500);
     window.dispatchEvent(new Event('routechange'));
   } else {
     resetSEO();
     mainContent.innerHTML = `
       <section class="empty-state notfound-state">
-        <div class="empty-state-icon">🔎</div>
+        <div class="empty-state-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
         <div class="empty-state-text">Không tìm thấy trang bạn đang mở</div>
         <p class="notfound-hint">Liên kết có thể đã thay đổi hoặc nội dung không còn khả dụng.</p>
         <div class="notfound-actions">

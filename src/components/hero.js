@@ -51,26 +51,26 @@ export function renderHero(container, items) {
             <div class="hero-gradient"></div>
             <div class="hero-content">
               <div class="hero-badge">
-                <span>★</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                 <span>${item.lang || 'Vietsub'}</span>
               </div>
               <h1 class="hero-title">${item.name.split('(')[0].trim()}</h1>
               <div class="hero-meta">
-                ${item.tmdb?.vote_average ? `<span class="hero-rating">★ ${item.tmdb.vote_average.toFixed(1)}</span>` : ''}
+                ${item.tmdb?.vote_average ? `<span class="hero-rating"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> ${item.tmdb.vote_average.toFixed(1)}</span>` : ''}
                 ${item.quality ? `<span class="quality">${item.quality}</span>` : ''}
                 ${item.year ? `<span class="year">${item.year}</span>` : ''}
                 ${item.episode_current ? `<span class="hero-meta-item">${item.episode_current}</span>` : ''}
-                ${item.time ? `<span class="hero-meta-item">⏱ ${item.time}</span>` : ''}
+                ${item.time ? `<span class="hero-meta-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> ${item.time}</span>` : ''}
               </div>
               ${item.category ? `
-                <p class="hero-desc">${item.category.map(c => c.name).join(' • ')}</p>
+                <p class="hero-desc">${item.category.map(c => c.name).join(' \u2022 ')}</p>
               ` : ''}
               <div class="hero-actions">
                 <button class="btn btn-primary hero-watch-btn" data-slug="${item.slug}">
-                  ▶ Xem ngay
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Xem ngay
                 </button>
                 <button class="btn btn-outline hero-detail-btn" data-slug="${item.slug}">
-                  ℹ Chi tiết
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Chi ti\u1ebft
                 </button>
               </div>
             </div>

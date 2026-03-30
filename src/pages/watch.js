@@ -109,9 +109,9 @@ export async function renderWatchPage({ slug, ep }) {
     if (!movie || !movie.name) {
       main.innerHTML = `
         <div class="empty-state" style="padding-top:120px">
-          <div class="empty-state-icon">😔</div>
-          <div class="empty-state-text">Không tìm thấy anime này</div>
-          <a href="/" class="btn btn-primary" style="margin-top:16px">Về trang chủ</a>
+          <div class="empty-state-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div>
+          <div class="empty-state-text">Kh\u00f4ng t\u00ecm th\u1ea5y anime n\u00e0y</div>
+          <a href="/" class="btn btn-primary" style="margin-top:16px">V\u1ec1 trang ch\u1ee7</a>
         </div>
       `;
       return;
@@ -144,9 +144,9 @@ export async function renderWatchPage({ slug, ep }) {
     if (!currentEp) {
       main.innerHTML = `
         <div class="empty-state" style="padding-top:120px">
-          <div class="empty-state-icon">📺</div>
-          <div class="empty-state-text">Không tìm thấy tập phim này</div>
-          <a href="/anime/${slug}" class="btn btn-primary" style="margin-top:16px">Quay lại</a>
+          <div class="empty-state-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div>
+          <div class="empty-state-text">Kh\u00f4ng t\u00ecm th\u1ea5y t\u1eadp phim n\u00e0y</div>
+          <a href="/anime/${slug}" class="btn btn-primary" style="margin-top:16px">Quay l\u1ea1i</a>
         </div>
       `;
       return;
@@ -198,8 +198,8 @@ export async function renderWatchPage({ slug, ep }) {
           ` : `
             <div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);">
               <div style="text-align:center">
-                <div style="font-size:2rem;margin-bottom:8px">📺</div>
-                <div>Không có link phát. Vui lòng thử server khác.</div>
+                <div style="margin-bottom:8px"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div>
+                <div>Kh\u00f4ng c\u00f3 link ph\u00e1t. Vui l\u00f2ng th\u1eed server kh\u00e1c.</div>
               </div>
             </div>
           `}
@@ -212,13 +212,13 @@ export async function renderWatchPage({ slug, ep }) {
           <div class="watch-nav">
             ${prevEp ? `
               <button class="btn btn-outline" id="prev-ep-btn" data-ep="${prevEp.slug || prevEp.name}">
-                ⬅ Tập trước
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg> T\u1eadp tr\u01b0\u1edbc
               </button>
             ` : ''}
-            <a href="/anime/${slug}" class="btn btn-outline">📋 Danh sách tập</a>
+            <a href="/anime/${slug}" class="btn btn-outline"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg> Danh s\u00e1ch t\u1eadp</a>
             ${nextEp ? `
               <button class="btn btn-primary" id="next-ep-btn" data-ep="${nextEp.slug || nextEp.name}">
-                Tập tiếp ➡
+                T\u1eadp ti\u1ebfp <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
               </button>
             ` : ''}
           </div>
@@ -316,9 +316,9 @@ export async function renderWatchPage({ slug, ep }) {
     console.error('Watch page error:', err);
     main.innerHTML = `
       <div class="empty-state" style="padding-top:120px">
-        <div class="empty-state-icon">⚠️</div>
-        <div class="empty-state-text">Lỗi tải phim: ${err.message}</div>
-        <a href="/anime/${slug}" class="btn btn-primary" style="margin-top:16px">Quay lại</a>
+        <div class="empty-state-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+        <div class="empty-state-text">L\u1ed7i t\u1ea3i phim: ${err.message}</div>
+        <a href="/anime/${slug}" class="btn btn-primary" style="margin-top:16px">Quay l\u1ea1i</a>
       </div>
     `;
   }

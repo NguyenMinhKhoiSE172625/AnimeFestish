@@ -33,8 +33,8 @@ export async function renderSearchPage({ keyword }) {
     if (!query.trim()) {
       resultsContainer.innerHTML = `
         <div class="empty-state" style="grid-column:1/-1">
-          <div class="empty-state-icon">🔍</div>
-          <div class="empty-state-text">Nhập tên anime để tìm kiếm...</div>
+          <div class="empty-state-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
+          <div class="empty-state-text">Nh\u1eadp t\u00ean anime \u0111\u1ec3 t\u00ecm ki\u1ebfm...</div>
         </div>
       `;
       resultsInfo.textContent = '';
@@ -60,8 +60,8 @@ export async function renderSearchPage({ keyword }) {
       if (items.length === 0) {
         resultsContainer.innerHTML = `
           <div class="empty-state" style="grid-column:1/-1">
-            <div class="empty-state-icon">😔</div>
-            <div class="empty-state-text">Không tìm thấy kết quả cho "${query}"</div>
+            <div class="empty-state-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div>
+            <div class="empty-state-text">Kh\u00f4ng t\u00ecm th\u1ea5y k\u1ebft qu\u1ea3 cho "${query}"</div>
           </div>
         `;
         resultsInfo.textContent = '';
@@ -71,8 +71,10 @@ export async function renderSearchPage({ keyword }) {
 
       resultsInfo.textContent = `Tìm thấy ${pagination.totalItems || items.length} kết quả cho "${query}"`;
 
-      items.forEach(item => {
-        resultsContainer.appendChild(createAnimeCard(item));
+      items.forEach((item, i) => {
+        const card = createAnimeCard(item);
+        card.style.setProperty('--index', i);
+        resultsContainer.appendChild(card);
       });
 
       // Pagination
@@ -92,8 +94,8 @@ export async function renderSearchPage({ keyword }) {
       console.error('Search error:', err);
       resultsContainer.innerHTML = `
         <div class="empty-state" style="grid-column:1/-1">
-          <div class="empty-state-icon">⚠️</div>
-          <div class="empty-state-text">Lỗi tìm kiếm: ${err.message}</div>
+          <div class="empty-state-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+          <div class="empty-state-text">L\u1ed7i t\u00ecm ki\u1ebfm: ${err.message}</div>
         </div>
       `;
     }
@@ -117,8 +119,8 @@ export async function renderSearchPage({ keyword }) {
   } else {
     resultsContainer.innerHTML = `
       <div class="empty-state" style="grid-column:1/-1">
-        <div class="empty-state-icon">🔍</div>
-        <div class="empty-state-text">Nhập tên anime để tìm kiếm...</div>
+        <div class="empty-state-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
+        <div class="empty-state-text">Nh\u1eadp t\u00ean anime \u0111\u1ec3 t\u00ecm ki\u1ebfm...</div>
       </div>
     `;
   }
