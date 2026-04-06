@@ -1229,15 +1229,45 @@ input {
   padding: var(--space-lg);
 }
 
+/* === Premium Player Wrapper === */
 .player-wrapper {
   position: relative;
   width: 100%;
   aspect-ratio: 16/9;
   background: #000;
-  border-radius: var(--card-radius);
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: var(--shadow-card), 0 0 30px rgba(139, 92, 246, 0.1);
-  border: 1px solid rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(255, 45, 120, 0.18);
+  box-shadow:
+    0 16px 48px rgba(5, 10, 18, 0.55),
+    0 0 0 1px rgba(255, 45, 120, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: box-shadow 0.5s var(--ease-premium), border-color 0.5s var(--ease-premium);
+}
+
+/* Ambient glow behind player */
+.player-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: -40px;
+  z-index: -1;
+  border-radius: 36px;
+  background: radial-gradient(ellipse at 50% 80%, rgba(255, 45, 120, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s var(--ease-premium);
+}
+
+.player-wrapper:hover::before {
+  opacity: 1;
+}
+
+.player-wrapper:hover {
+  border-color: rgba(255, 45, 120, 0.28);
+  box-shadow:
+    0 24px 64px rgba(5, 10, 18, 0.6),
+    0 0 36px rgba(255, 45, 120, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .player-wrapper iframe {
@@ -1267,6 +1297,11 @@ input {
   background: #000;
 }
 
+.player-wrapper:fullscreen::before,
+.player-wrapper:-webkit-full-screen::before {
+  display: none;
+}
+
 .player-wrapper:fullscreen video,
 .player-wrapper:-webkit-full-screen video {
   width: 100%;
@@ -1274,8 +1309,163 @@ input {
   object-fit: contain;
 }
 
+/* === Gesture OSD — Glass Pill with Spring Scale === */
+.player-osd {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.6);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  border-radius: 16px;
+  background: rgba(10, 14, 22, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+  z-index: 20;
+  opacity: 0;
+  white-space: nowrap;
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: opacity 0.15s, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.player-osd.visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.player-osd-icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 6px rgba(255, 45, 120, 0.35));
+}
+
+.player-osd-icon svg {
+  display: block;
+}
+
+/* === Double-Tap Ripple (YouTube-style) === */
+.player-tap-ripple {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 45%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 18;
+  color: #fff;
+}
+
+.player-tap-ripple.left {
+  left: 0;
+  border-radius: 0 50% 50% 0;
+  background: radial-gradient(circle at 30% 50%, rgba(255, 255, 255, 0.12), transparent 70%);
+  animation: tapRippleLeft 0.5s var(--ease-premium) forwards;
+}
+
+.player-tap-ripple.right {
+  right: 0;
+  border-radius: 50% 0 0 50%;
+  background: radial-gradient(circle at 70% 50%, rgba(255, 255, 255, 0.12), transparent 70%);
+  animation: tapRippleRight 0.5s var(--ease-premium) forwards;
+}
+
+@keyframes tapRippleLeft {
+  0%   { opacity: 0; transform: scale(0.7); }
+  30%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.1); }
+}
+
+@keyframes tapRippleRight {
+  0%   { opacity: 0; transform: scale(0.7); }
+  30%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.1); }
+}
+
+.player-tap-ripple svg {
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.4));
+}
+
+/* === Skip Intro — Shimmer Border + Pulse === */
+.player-skip-intro {
+  position: absolute;
+  bottom: 60px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 20px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 45, 120, 0.35);
+  background: rgba(10, 14, 22, 0.7);
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  z-index: 15;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(12px);
+  transition: opacity 0.4s, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s, box-shadow 0.3s;
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 16px rgba(255, 45, 120, 0.1);
+}
+
+.player-skip-intro.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+  animation: skipIntroPulse 2.5s ease-in-out 1s infinite;
+}
+
+@keyframes skipIntroPulse {
+  0%, 100% { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 16px rgba(255, 45, 120, 0.1); }
+  50%      { box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 28px rgba(255, 45, 120, 0.22); }
+}
+
+.player-skip-intro:hover {
+  background: rgba(255, 45, 120, 0.4);
+  border-color: rgba(255, 45, 120, 0.6);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 32px rgba(255, 45, 120, 0.3);
+}
+
+.player-skip-intro:active {
+  transform: scale(0.95);
+  transition-duration: 80ms;
+}
+
+.player-skip-intro svg {
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 4px rgba(255, 45, 120, 0.4));
+}
+
 .watch-info {
   padding: var(--space-lg) 0;
+}
+
+.watch-info > * {
+  animation: watchInfoIn 0.45s var(--ease-premium) backwards;
+}
+
+.watch-info > :nth-child(1) { animation-delay: 0.05s; }
+.watch-info > :nth-child(2) { animation-delay: 0.12s; }
+.watch-info > :nth-child(3) { animation-delay: 0.2s; }
+
+@keyframes watchInfoIn {
+  from { opacity: 0; transform: translateY(10px); }
 }
 
 .watch-title {
@@ -4053,8 +4243,22 @@ textarea:focus-visible {
 
 .player-wrapper {
   border-radius: 22px;
-  border-color: rgba(255, 45, 120, 0.24);
-  box-shadow: var(--shadow-card-hover);
+}
+
+/* Episode active glow in watch page */
+.episodes-section .episode-btn.active {
+  box-shadow: 0 10px 24px rgba(255, 45, 120, 0.24), 0 0 12px rgba(255, 45, 120, 0.12);
+  animation: episodeActiveGlow 2s ease-in-out infinite;
+}
+
+@keyframes episodeActiveGlow {
+  0%, 100% { box-shadow: 0 10px 24px rgba(255, 45, 120, 0.24), 0 0 12px rgba(255, 45, 120, 0.12); }
+  50%      { box-shadow: 0 10px 24px rgba(255, 45, 120, 0.32), 0 0 20px rgba(255, 45, 120, 0.2); }
+}
+
+/* Server tab active glow */
+.server-tab.active {
+  box-shadow: 0 8px 20px rgba(255, 45, 120, 0.22);
 }
 
 .comment-feedback {
@@ -4643,9 +4847,7 @@ body::before {
   box-shadow: var(--shadow-card-hover), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-.player-wrapper {
-  box-shadow: var(--shadow-card-hover), inset 0 1px 0 rgba(255, 255, 255, 0.04);
-}
+/* player-wrapper shadow handled in base definition */
 
 .detail-poster {
   box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255, 255, 255, 0.06);

@@ -31,40 +31,73 @@ function destroyHls() {
   clearTimeout(controlsHideTimer);
 }
 
-// Auto-rotate to landscape on fullscreen (mobile)
-function setupFullscreenRotation(video) {
+// === Player Gesture & Controls System ===
+
+function setupPlayerControls(video) {
   const wrapper = video.closest('.player-wrapper');
   if (!wrapper) return;
 
-  function onFullscreenChange() {
-    const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
-    if (isFs) {
-      // Try lock to landscape
-      try { screen.orientation.lock('landscape').catch(() => {}); } catch (e) {}
-    } else {
-      try { screen.orientation.unlock(); } catch (e) {}
-    }
+  // --- OSD overlay for gesture feedback ---
+  const osd = document.createElement('div');
+  osd.className = 'player-osd';
+  wrapper.appendChild(osd);
+  let osdTimer = null;
+
+  function showOSD(icon, text) {
+    osd.innerHTML = `<span class="player-osd-icon">${icon}</span><span>${text}</span>`;
+    osd.classList.remove('visible');
+    void osd.offsetWidth; // force reflow to restart animation
+    osd.classList.add('visible');
+    clearTimeout(osdTimer);
+    osdTimer = setTimeout(() => osd.classList.remove('visible'), 800);
   }
 
-  document.addEventListener('fullscreenchange', onFullscreenChange);
-  document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+  // --- Double-tap ripple effect (YouTube-style) ---
+  function showTapRipple(side) {
+    const ripple = document.createElement('div');
+    ripple.className = `player-tap-ripple ${side}`;
+    ripple.innerHTML = side === 'right'
+      ? '<svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor" opacity="0.9"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>'
+      : '<svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor" opacity="0.9"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/></svg>';
+    wrapper.appendChild(ripple);
+    ripple.addEventListener('animationend', () => ripple.remove());
+  }
 
-  // Double-tap or pinch-to-fullscreen helper for mobile
-  wrapper.addEventListener('dblclick', () => {
-    if (document.fullscreenElement || document.webkitFullscreenElement) {
-      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
-    } else {
-      const el = wrapper.requestFullscreen ? wrapper : video;
-      (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
-    }
-  });
-}
+  // --- Brightness (CSS filter, 0.2–1.5) ---
+  let brightness = 1;
 
-// Auto-hide native controls after inactivity (mobile)
-function setupControlsAutoHide(video) {
-  const wrapper = video.closest('.player-wrapper');
-  if (!wrapper) return;
+  function setBrightness(val) {
+    brightness = Math.max(0.2, Math.min(1.5, val));
+    video.style.filter = `brightness(${brightness})`;
+    const pct = Math.round(brightness * 100);
+    const icon = pct > 100
+      ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+      : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2"/></svg>';
+    showOSD(icon, `${pct}%`);
+  }
 
+  // --- Volume (0–1) ---
+  function setVolume(val) {
+    video.volume = Math.max(0, Math.min(1, val));
+    video.muted = video.volume === 0;
+    const pct = Math.round(video.volume * 100);
+    const icon = pct === 0
+      ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>'
+      : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
+    showOSD(icon, `${pct}%`);
+  }
+
+  // --- Seek ---
+  function seekBy(sec) {
+    video.currentTime = Math.max(0, Math.min(video.duration || 0, video.currentTime + sec));
+    const sign = sec > 0 ? '+' : '';
+    const icon = sec > 0
+      ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>'
+      : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>';
+    showOSD(icon, `${sign}${sec}s`);
+  }
+
+  // --- Auto-hide controls ---
   function showControls() {
     video.controls = true;
     wrapper.classList.remove('controls-hidden');
@@ -73,31 +106,152 @@ function setupControlsAutoHide(video) {
   }
 
   function hideControls() {
-    if (video.paused) return; // Keep controls when paused
+    if (video.paused) return;
     video.controls = false;
     wrapper.classList.add('controls-hidden');
   }
 
-  // Show on any interaction
-  wrapper.addEventListener('touchstart', showControls, { passive: true });
-  wrapper.addEventListener('mousemove', showControls, { passive: true });
-  wrapper.addEventListener('click', showControls);
-
-  // Keep visible when paused, start hiding when playing
   video.addEventListener('pause', () => {
     clearTimeout(controlsHideTimer);
     video.controls = true;
     wrapper.classList.remove('controls-hidden');
   });
+  video.addEventListener('play', () => showControls());
+  video.addEventListener('seeking', showControls);
+  wrapper.addEventListener('mousemove', showControls, { passive: true });
+  showControls();
 
-  video.addEventListener('play', () => {
-    showControls(); // Reset the 3s timer
+  // --- Fullscreen + orientation lock ---
+  function onFullscreenChange() {
+    const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
+    if (isFs) {
+      try { screen.orientation.lock('landscape').catch(() => {}); } catch (e) {}
+    } else {
+      try { screen.orientation.unlock(); } catch (e) {}
+    }
+  }
+  document.addEventListener('fullscreenchange', onFullscreenChange);
+  document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+
+  // --- Skip Intro Button (85s, typical anime OP) ---
+  const skipBtn = document.createElement('button');
+  skipBtn.className = 'player-skip-intro';
+  skipBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg> B\u1ecf qua Intro';
+  wrapper.appendChild(skipBtn);
+
+  skipBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    seekBy(85);
+    skipBtn.classList.remove('visible');
   });
 
-  video.addEventListener('seeking', showControls);
+  video.addEventListener('timeupdate', () => {
+    const t = video.currentTime;
+    const show = t >= 5 && t <= 120 && !video.paused;
+    skipBtn.classList.toggle('visible', show);
+  });
 
-  // Initial state
-  showControls();
+  // --- Touch Gesture Engine ---
+  let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+  let gesture = null; // 'brightness' | 'volume' | 'seek' | null
+  let startBrightness = 1, startVolume = 1, startTime = 0;
+  const DEAD_ZONE = 15; // px before gesture activates
+
+  // Double-tap tracking
+  let lastTapTime = 0, lastTapX = 0, tapAccum = 0, tapFlushTimer = null;
+
+  wrapper.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 1) return;
+    const t = e.touches[0];
+    touchStartX = t.clientX;
+    touchStartY = t.clientY;
+    touchStartTime = Date.now();
+    gesture = null;
+    startBrightness = brightness;
+    startVolume = video.volume;
+    startTime = video.currentTime;
+  }, { passive: true });
+
+  wrapper.addEventListener('touchmove', (e) => {
+    if (e.touches.length !== 1) return;
+    const t = e.touches[0];
+    const dx = t.clientX - touchStartX;
+    const dy = t.clientY - touchStartY;
+    const rect = wrapper.getBoundingClientRect();
+
+    // Determine gesture on first significant movement
+    if (!gesture) {
+      if (Math.abs(dx) < DEAD_ZONE && Math.abs(dy) < DEAD_ZONE) return;
+      if (Math.abs(dy) > Math.abs(dx)) {
+        // Vertical — left half = brightness, right half = volume
+        gesture = touchStartX < rect.left + rect.width / 2 ? 'brightness' : 'volume';
+      } else {
+        gesture = 'seek';
+      }
+      // Once gesture detected, hide native controls
+      video.controls = false;
+      wrapper.classList.add('controls-hidden');
+    }
+
+    if (gesture === 'brightness') {
+      e.preventDefault();
+      const delta = -dy / (rect.height * 0.7); // full height ~= 1.0 range
+      setBrightness(startBrightness + delta);
+    } else if (gesture === 'volume') {
+      e.preventDefault();
+      const delta = -dy / (rect.height * 0.7);
+      setVolume(startVolume + delta);
+    } else if (gesture === 'seek') {
+      e.preventDefault();
+      const duration = video.duration || 1;
+      const maxSeek = Math.min(duration * 0.5, 120); // cap at 50% or 2min
+      const delta = (dx / rect.width) * maxSeek;
+      video.currentTime = Math.max(0, Math.min(duration, startTime + delta));
+      const sec = Math.round(video.currentTime - startTime);
+      const sign = sec >= 0 ? '+' : '';
+      const icon = sec >= 0
+        ? '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>'
+        : '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>';
+      showOSD(icon, `${sign}${sec}s`);
+    }
+  }, { passive: false });
+
+  wrapper.addEventListener('touchend', (e) => {
+    const elapsed = Date.now() - touchStartTime;
+
+    // If no gesture was activated and it was a short tap → handle tap/double-tap
+    if (!gesture && elapsed < 300) {
+      const now = Date.now();
+      const rect = wrapper.getBoundingClientRect();
+      const tapX = touchStartX;
+      const isRight = tapX > rect.left + rect.width / 2;
+      const isLeft = tapX < rect.left + rect.width / 2;
+
+      if (now - lastTapTime < 350 && Math.abs(tapX - lastTapX) < 80) {
+        // Consecutive tap on same side
+        const seekDir = isRight ? 5 : -5;
+        tapAccum += seekDir;
+        seekBy(seekDir);
+        showTapRipple(isRight ? 'right' : 'left');
+
+        // Flush accumulated display after taps stop
+        clearTimeout(tapFlushTimer);
+        tapFlushTimer = setTimeout(() => { tapAccum = 0; }, 600);
+      } else {
+        // Single tap — just show/hide controls
+        tapAccum = 0;
+        showControls();
+      }
+
+      lastTapTime = now;
+      lastTapX = tapX;
+    } else if (gesture) {
+      // Gesture ended, show controls briefly
+      showControls();
+    }
+
+    gesture = null;
+  }, { passive: true });
 }
 
 async function initHlsPlayer(m3u8Url, embedFallbackUrl) {
@@ -128,16 +282,14 @@ async function initHlsPlayer(m3u8Url, embedFallbackUrl) {
           wrapper.innerHTML = `<iframe id="player-iframe" src="${fallback}" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture; fullscreen" loading="lazy" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>`;
         }
       });
-      setupFullscreenRotation(video);
-      setupControlsAutoHide(video);
+      setupPlayerControls(video);
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       // Safari native HLS
       video.src = cleanUrl;
       video.addEventListener('loadedmetadata', () => {
         video.play().catch(() => {});
       });
-      setupFullscreenRotation(video);
-      setupControlsAutoHide(video);
+      setupPlayerControls(video);
     }
   } catch (err) {
     console.warn('HLS.js load failed, falling back to iframe:', err);
