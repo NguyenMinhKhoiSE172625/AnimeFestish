@@ -245,6 +245,7 @@ function setupPlayerControls(video) {
   }, { passive: true });
 
   touchLayer.addEventListener('touchmove', (e) => {
+    e.preventDefault(); // Always block browser scroll/zoom — must be first
     if (e.touches.length !== 1) return;
     const t = e.touches[0];
     const dx = t.clientX - touchStartX;
@@ -262,8 +263,6 @@ function setupPlayerControls(video) {
       wrapper.classList.remove('controls-visible');
       wrapper.classList.add('controls-hidden');
     }
-
-    e.preventDefault();
 
     if (gesture === 'brightness') {
       const delta = -dy / (rect.height * 0.7);
