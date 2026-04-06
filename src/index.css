@@ -1543,6 +1543,14 @@ input {
 }
 
 /* --- Iframe Fullscreen (Landscape) Button --- */
+/* Kill 300ms tap delay on all player buttons */
+.player-center-btn,
+.player-fs-btn,
+.player-skip-intro,
+.player-iframe-fs-btn {
+  touch-action: manipulation;
+}
+
 /* --- Center Play/Pause Button --- */
 .player-center-btn {
   position: absolute;

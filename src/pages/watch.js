@@ -111,11 +111,12 @@ function setupPlayerControls(video) {
   playPauseBtn.innerHTML = '<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
   wrapper.appendChild(playPauseBtn);
 
-  playPauseBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
+  function togglePlayPause() {
     if (video.paused) { video.play().catch(() => {}); }
     else { video.pause(); }
-  });
+  }
+  playPauseBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePlayPause(); });
+  playPauseBtn.addEventListener('touchend', (e) => { e.preventDefault(); e.stopPropagation(); togglePlayPause(); }, { passive: false });
 
   video.addEventListener('play', () => {
     playPauseBtn.innerHTML = '<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
@@ -130,14 +131,20 @@ function setupPlayerControls(video) {
   fsBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>';
   wrapper.appendChild(fsBtn);
 
-  fsBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
+  function toggleFullscreen() {
     if (document.fullscreenElement || document.webkitFullscreenElement) {
       (document.exitFullscreen || document.webkitExitFullscreen).call(document);
     } else {
-      (wrapper.requestFullscreen || wrapper.webkitRequestFullscreen).call(wrapper);
+      const fn = wrapper.requestFullscreen || wrapper.webkitRequestFullscreen;
+      if (fn) fn.call(wrapper).catch(() => {
+        // Fallback: try on video directly (some mobile browsers)
+        const vfn = video.requestFullscreen || video.webkitEnterFullscreen || video.webkitRequestFullscreen;
+        if (vfn) vfn.call(video);
+      });
     }
-  });
+  }
+  fsBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleFullscreen(); });
+  fsBtn.addEventListener('touchend', (e) => { e.preventDefault(); e.stopPropagation(); toggleFullscreen(); }, { passive: false });
 
   // Custom progress bar (pink, replaces red native one)
   const progressWrap = document.createElement('div');
