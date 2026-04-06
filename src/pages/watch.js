@@ -105,6 +105,40 @@ function setupPlayerControls(video) {
   touchLayer.className = 'player-touch-layer';
   wrapper.appendChild(touchLayer);
 
+  // Center play/pause button
+  const playPauseBtn = document.createElement('button');
+  playPauseBtn.className = 'player-center-btn';
+  playPauseBtn.innerHTML = '<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+  wrapper.appendChild(playPauseBtn);
+
+  playPauseBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (video.paused) { video.play().catch(() => {}); }
+    else { video.pause(); }
+  });
+
+  video.addEventListener('play', () => {
+    playPauseBtn.innerHTML = '<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+  });
+  video.addEventListener('pause', () => {
+    playPauseBtn.innerHTML = '<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+  });
+
+  // Fullscreen button
+  const fsBtn = document.createElement('button');
+  fsBtn.className = 'player-fs-btn';
+  fsBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>';
+  wrapper.appendChild(fsBtn);
+
+  fsBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    } else {
+      (wrapper.requestFullscreen || wrapper.webkitRequestFullscreen).call(wrapper);
+    }
+  });
+
   // Custom progress bar (pink, replaces red native one)
   const progressWrap = document.createElement('div');
   progressWrap.className = 'player-progress';
@@ -154,8 +188,8 @@ function setupPlayerControls(video) {
     controlsHideTimer = setTimeout(hideControls, 3500);
   }
 
-  function hideControls() {
-    if (video.paused) return;
+  function hideControls(force) {
+    if (video.paused && !force) return;
     wrapper.classList.remove('controls-visible');
     wrapper.classList.add('controls-hidden');
   }
@@ -269,16 +303,13 @@ function setupPlayerControls(video) {
         clearTimeout(tapFlushTimer);
         tapFlushTimer = setTimeout(() => { tapAccum = 0; }, 600);
       } else {
-        // Single tap → toggle play/pause + show controls
+        // Single tap → toggle controls visibility
         tapAccum = 0;
-        if (video.paused) {
-          video.play().catch(() => {});
-          showOSD('<svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>', '');
+        if (wrapper.classList.contains('controls-visible')) {
+          hideControls();
         } else {
-          video.pause();
-          showOSD('<svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>', '');
+          showControls();
         }
-        showControls();
       }
 
       lastTapTime = now;
@@ -290,17 +321,24 @@ function setupPlayerControls(video) {
     gesture = null;
   }, { passive: true });
 
-  // Desktop: click on touch layer = play/pause
+  // Desktop: click on touch layer = toggle controls
   touchLayer.addEventListener('click', (e) => {
     if (e.target !== touchLayer) return;
-    if (video.paused) {
-      video.play().catch(() => {});
-      showOSD('<svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>', '');
+    if (wrapper.classList.contains('controls-visible')) {
+      hideControls();
     } else {
-      video.pause();
-      showOSD('<svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>', '');
+      showControls();
     }
-    showControls();
+  });
+
+  // Desktop: double-click = toggle fullscreen
+  touchLayer.addEventListener('dblclick', (e) => {
+    e.preventDefault();
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    } else {
+      (wrapper.requestFullscreen || wrapper.webkitRequestFullscreen).call(wrapper);
+    }
   });
 }
 

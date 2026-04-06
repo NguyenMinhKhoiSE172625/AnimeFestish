@@ -1543,6 +1543,78 @@ input {
 }
 
 /* --- Iframe Fullscreen (Landscape) Button --- */
+/* --- Center Play/Pause Button --- */
+.player-center-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  cursor: pointer;
+  z-index: 14;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s, transform 0.3s var(--ease-spring);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.controls-visible .player-center-btn {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.player-center-btn:active {
+  transform: translate(-50%, -50%) scale(0.88);
+  transition-duration: 80ms;
+}
+
+/* --- Fullscreen Button --- */
+.player-fs-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  cursor: pointer;
+  z-index: 22;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s, background 0.2s;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.controls-visible .player-fs-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.player-fs-btn:hover {
+  background: rgba(255, 45, 120, 0.4);
+}
+
+.player-fs-btn:active {
+  transform: scale(0.9);
+  transition-duration: 80ms;
+}
+
 .player-iframe-fs-btn {
   position: absolute;
   top: 10px;
