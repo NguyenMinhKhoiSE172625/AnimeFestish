@@ -1253,6 +1253,27 @@ input {
   outline: none;
 }
 
+/* Auto-hide controls: smooth cursor hide */
+.player-wrapper.controls-hidden {
+  cursor: none;
+}
+
+/* Fullscreen player fills screen */
+.player-wrapper:fullscreen,
+.player-wrapper:-webkit-full-screen {
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  background: #000;
+}
+
+.player-wrapper:fullscreen video,
+.player-wrapper:-webkit-full-screen video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 .watch-info {
   padding: var(--space-lg) 0;
 }

@@ -13,6 +13,7 @@ function decodeHtml(html) {
 
 let currentHls = null;
 let HlsLib = null;
+let controlsHideTimer = null;
 
 async function loadHls() {
   if (!HlsLib) {
@@ -27,6 +28,76 @@ function destroyHls() {
     currentHls.destroy();
     currentHls = null;
   }
+  clearTimeout(controlsHideTimer);
+}
+
+// Auto-rotate to landscape on fullscreen (mobile)
+function setupFullscreenRotation(video) {
+  const wrapper = video.closest('.player-wrapper');
+  if (!wrapper) return;
+
+  function onFullscreenChange() {
+    const isFs = !!(document.fullscreenElement || document.webkitFullscreenElement);
+    if (isFs) {
+      // Try lock to landscape
+      try { screen.orientation.lock('landscape').catch(() => {}); } catch (e) {}
+    } else {
+      try { screen.orientation.unlock(); } catch (e) {}
+    }
+  }
+
+  document.addEventListener('fullscreenchange', onFullscreenChange);
+  document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+
+  // Double-tap or pinch-to-fullscreen helper for mobile
+  wrapper.addEventListener('dblclick', () => {
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    } else {
+      const el = wrapper.requestFullscreen ? wrapper : video;
+      (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+    }
+  });
+}
+
+// Auto-hide native controls after inactivity (mobile)
+function setupControlsAutoHide(video) {
+  const wrapper = video.closest('.player-wrapper');
+  if (!wrapper) return;
+
+  function showControls() {
+    video.controls = true;
+    wrapper.classList.remove('controls-hidden');
+    clearTimeout(controlsHideTimer);
+    controlsHideTimer = setTimeout(hideControls, 3000);
+  }
+
+  function hideControls() {
+    if (video.paused) return; // Keep controls when paused
+    video.controls = false;
+    wrapper.classList.add('controls-hidden');
+  }
+
+  // Show on any interaction
+  wrapper.addEventListener('touchstart', showControls, { passive: true });
+  wrapper.addEventListener('mousemove', showControls, { passive: true });
+  wrapper.addEventListener('click', showControls);
+
+  // Keep visible when paused, start hiding when playing
+  video.addEventListener('pause', () => {
+    clearTimeout(controlsHideTimer);
+    video.controls = true;
+    wrapper.classList.remove('controls-hidden');
+  });
+
+  video.addEventListener('play', () => {
+    showControls(); // Reset the 3s timer
+  });
+
+  video.addEventListener('seeking', showControls);
+
+  // Initial state
+  showControls();
 }
 
 async function initHlsPlayer(m3u8Url, embedFallbackUrl) {
@@ -57,12 +128,16 @@ async function initHlsPlayer(m3u8Url, embedFallbackUrl) {
           wrapper.innerHTML = `<iframe id="player-iframe" src="${fallback}" allowfullscreen allow="autoplay; encrypted-media; picture-in-picture; fullscreen" loading="lazy" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>`;
         }
       });
+      setupFullscreenRotation(video);
+      setupControlsAutoHide(video);
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       // Safari native HLS
       video.src = cleanUrl;
       video.addEventListener('loadedmetadata', () => {
         video.play().catch(() => {});
       });
+      setupFullscreenRotation(video);
+      setupControlsAutoHide(video);
     }
   } catch (err) {
     console.warn('HLS.js load failed, falling back to iframe:', err);
