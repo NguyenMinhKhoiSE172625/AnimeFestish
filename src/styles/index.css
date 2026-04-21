@@ -5294,6 +5294,12 @@ body::before {
   gap: var(--space-sm);
 }
 
+.player-controls-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
 /* Fix: override old absolute positioning for elements inside bottom-controls */
 .player-bottom-controls .player-progress {
   position: relative;
