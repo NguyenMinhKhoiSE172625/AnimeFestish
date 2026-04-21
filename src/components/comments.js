@@ -75,11 +75,11 @@ async function removeComment(slug, docId) {
 export function renderComments(container, slug) {
   container.innerHTML = `
     <div class="comments-section">
-      <h2 class="episodes-title">B\u00ecnh lu\u1eadn</h2>
+      <h2 class="episodes-title">Bình luận</h2>
       <div class="comment-feedback" id="comment-feedback" aria-live="polite"></div>
       <div class="comment-form-area" id="comment-form-area"></div>
       <div class="comment-list" id="comment-list">
-        <div class="comment-loading">\u0110ang t\u1ea3i b\u00ecnh lu\u1eadn...</div>
+        <div class="comment-loading">Đang tải bình luận...</div>
       </div>
     </div>
   `;
@@ -114,7 +114,7 @@ export function renderComments(container, slug) {
         listEl.innerHTML = `
           <div class="comment-empty">
             <span><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
-            <p>Ch\u01b0a c\u00f3 b\u00ecnh lu\u1eadn n\u00e0o. H\u00e3y l\u00e0 ng\u01b0\u1eddi \u0111\u1ea7u ti\u00ean!</p>
+            <p>Chưa có bình luận nào. Hãy là người đầu tiên!</p>
           </div>
         `;
         return;
@@ -123,7 +123,7 @@ export function renderComments(container, slug) {
       const currentUid = getUser()?.uid;
       pendingDeleteId = null;
       listEl.innerHTML = comments.map(c => {
-        const time = c.createdAt ? formatTime(c.createdAt) : 'V\u1eeba xong';
+        const time = c.createdAt ? formatTime(c.createdAt) : 'Vừa xong';
         const initial = (c.displayName || '?').charAt(0).toUpperCase();
         const isOwn = currentUid && c.uid === currentUid;
 
@@ -136,7 +136,7 @@ export function renderComments(container, slug) {
               <div class="comment-header">
                 <span class="comment-name">${escapeHtml(c.displayName)}</span>
                 <span class="comment-time">${time}</span>
-                ${isOwn ? `<button class="comment-delete" data-doc-id="${c.id}" title="X\u00f3a">\u2715</button>` : ''}
+                ${isOwn ? `<button class="comment-delete" data-doc-id="${c.id}" title="Xóa">✕</button>` : ''}
               </div>
               <p class="comment-text">${escapeHtml(c.text)}</p>
             </div>
@@ -172,7 +172,7 @@ export function renderComments(container, slug) {
       });
     } catch (err) {
       console.error('Load comments error:', err);
-      listEl.innerHTML = `<div class="comment-empty"><p>L\u1ed7i t\u1ea3i b\u00ecnh lu\u1eadn</p></div>`;
+      listEl.innerHTML = `<div class="comment-empty"><p>Lỗi tải bình luận</p></div>`;
       showFeedback('Không thể tải bình luận. Vui lòng thử lại sau.', 'error');
     }
   }
@@ -188,8 +188,8 @@ export function renderComments(container, slug) {
             ? `<img class="comment-avatar" src="${photo}" alt="${name}" referrerpolicy="no-referrer" />`
             : `<div class="comment-avatar comment-avatar-initial">${initial}</div>`}
           <div class="comment-input-area">
-            <textarea class="comment-input" id="comment-input" placeholder="Vi\u1ebft b\u00ecnh lu\u1eadn..." rows="1"></textarea>
-            <button class="comment-send" id="comment-send" disabled>G\u1eedi</button>
+            <textarea class="comment-input" id="comment-input" placeholder="Viết bình luận..." rows="1"></textarea>
+            <button class="comment-send" id="comment-send" disabled>Gửi</button>
           </div>
         </div>
       `;
@@ -237,8 +237,8 @@ export function renderComments(container, slug) {
     } else {
       formArea.innerHTML = `
         <div class="comment-login-prompt">
-          <span>\u0110\u0103ng nh\u1eadp \u0111\u1ec3 b\u00ecnh lu\u1eadn</span>
-          <button class="btn-login" id="comment-login-btn">\u0110\u0103ng nh\u1eadp</button>
+          <span>Đăng nhập để bình luận</span>
+          <button class="btn-login" id="comment-login-btn">Đăng nhập</button>
         </div>
       `;
       formArea.querySelector('#comment-login-btn').addEventListener('click', () => {
@@ -259,10 +259,10 @@ export function renderComments(container, slug) {
 function formatTime(date) {
   const now = new Date();
   const diff = (now - date) / 1000;
-  if (diff < 60) return 'V\u1eeba xong';
-  if (diff < 3600) return `${Math.floor(diff / 60)} ph\u00fat tr\u01b0\u1edbc`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)} gi\u1edd tr\u01b0\u1edbc`;
-  if (diff < 604800) return `${Math.floor(diff / 86400)} ng\u00e0y tr\u01b0\u1edbc`;
+  if (diff < 60) return 'Vừa xong';
+  if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
+  if (diff < 604800) return `${Math.floor(diff / 86400)} ngày trước`;
   return date.toLocaleDateString('vi-VN');
 }
 

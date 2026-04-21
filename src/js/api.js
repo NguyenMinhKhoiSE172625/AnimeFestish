@@ -513,11 +513,11 @@ export async function fetchNewUpdates(page = 1) {
 
 
 /**
- * Get ad-free M3U8 URL via proxy
+ * Get direct M3U8 URL — source servers support CORS (*)
  */
 export function getCleanM3u8Url(m3u8Url) {
   if (!m3u8Url) return '';
-  return `${M3U8_PROXY_BASE}/clean?url=${encodeURIComponent(m3u8Url)}`;
+  return m3u8Url;
 }
 
 /**

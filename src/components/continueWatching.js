@@ -13,7 +13,7 @@ export function renderContinueWatching(container, items) {
   section.className = 'section';
   section.innerHTML = `
     <div class="section-header">
-      <h2 class="section-title">Ti\u1ebfp T\u1ee5c Xem</h2>
+      <h2 class="section-title">Tiếp Tục Xem</h2>
     </div>
     <div class="anime-row">
       <button class="anime-row-arrow left" aria-label="Scroll left">‹</button>

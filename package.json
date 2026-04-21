@@ -10,11 +10,16 @@
     "sitemap": "node scripts/generate-sitemap.js"
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^4.7.0",
     "terser": "^5.46.0",
     "vite": "^7.3.1"
   },
   "dependencies": {
     "firebase": "^12.10.0",
-    "hls.js": "^1.6.15"
+    "framer-motion": "^12.38.0",
+    "hls.js": "^1.6.15",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "react-router-dom": "^7.14.1"
   }
 }

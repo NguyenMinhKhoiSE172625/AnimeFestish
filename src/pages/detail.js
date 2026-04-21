@@ -39,8 +39,8 @@ export async function renderDetailPage({ slug }) {
       main.innerHTML = `
         <div class="empty-state" style="padding-top:120px">
           <div class="empty-state-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div>
-          <div class="empty-state-text">Kh\u00f4ng t\u00ecm th\u1ea5y anime n\u00e0y</div>
-          <a href="/" class="btn btn-primary" style="margin-top:16px">V\u1ec1 trang ch\u1ee7</a>
+          <div class="empty-state-text">Không tìm thấy anime này</div>
+          <a href="/" class="btn btn-primary" style="margin-top:16px">Về trang chủ</a>
         </div>
       `;
       return;
@@ -100,7 +100,7 @@ export async function renderDetailPage({ slug }) {
               ${movie.year ? `<span class="detail-meta-tag"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg> ${movie.year}</span>` : ''}
               ${movie.time ? `<span class="detail-meta-tag"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> ${movie.time}</span>` : ''}
               ${movie.episode_current ? `<span class="detail-meta-tag"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg> ${movie.episode_current}</span>` : ''}
-              ${movie.episode_total ? `<span class="detail-meta-tag"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg> ${movie.episode_total} t\u1eadp</span>` : ''}
+              ${movie.episode_total ? `<span class="detail-meta-tag"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg> ${movie.episode_total} tập</span>` : ''}
             </div>
             <div class="detail-categories">
               ${categories.map(c => `<span class="detail-cat">${c.name}</span>`).join('')}
@@ -109,7 +109,7 @@ export async function renderDetailPage({ slug }) {
             <p class="detail-desc">${movie.content || movie.description || 'Chưa có mô tả.'}</p>
             ${episodes.length > 0 && episodes[0].server_data && episodes[0].server_data.length > 0 ? `
               <div class="hero-actions">
-                <button class="btn btn-primary" id="watch-first-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> B\u1eaft \u0111\u1ea7u xem</button>
+                <button class="btn btn-primary" id="watch-first-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Bắt đầu xem</button>
               </div>
             ` : ''}
           </div>
@@ -142,7 +142,7 @@ export async function renderDetailPage({ slug }) {
         <div class="episodes-section">
           <div class="empty-state" style="padding:32px 0">
             <div class="empty-state-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div>
-            <div class="empty-state-text">Ch\u01b0a c\u00f3 t\u1eadp phim n\u00e0o</div>
+            <div class="empty-state-text">Chưa có tập phim nào</div>
           </div>
         </div>
       `}
@@ -214,8 +214,8 @@ export async function renderDetailPage({ slug }) {
     main.innerHTML = `
       <div class="empty-state" style="padding-top:120px">
         <div class="empty-state-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
-        <div class="empty-state-text">L\u1ed7i t\u1ea3i d\u1eef li\u1ec7u: ${err.message}</div>
-        <a href="/" class="btn btn-primary" style="margin-top:16px">V\u1ec1 trang ch\u1ee7</a>
+        <div class="empty-state-text">Lỗi tải dữ liệu: ${err.message}</div>
+        <a href="/" class="btn btn-primary" style="margin-top:16px">Về trang chủ</a>
       </div>
     `;
   }

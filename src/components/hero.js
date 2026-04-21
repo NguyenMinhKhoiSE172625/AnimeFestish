@@ -63,14 +63,14 @@ export function renderHero(container, items) {
                 ${item.time ? `<span class="hero-meta-item"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> ${item.time}</span>` : ''}
               </div>
               ${item.category ? `
-                <p class="hero-desc">${item.category.map(c => c.name).join(' \u2022 ')}</p>
+                <p class="hero-desc">${item.category.map(c => c.name).join(' • ')}</p>
               ` : ''}
               <div class="hero-actions">
                 <button class="btn btn-primary hero-watch-btn" data-slug="${item.slug}">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Xem ngay
                 </button>
                 <button class="btn btn-outline hero-detail-btn" data-slug="${item.slug}">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Chi ti\u1ebft
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Chi tiết
                 </button>
               </div>
             </div>
