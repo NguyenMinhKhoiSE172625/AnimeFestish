@@ -530,6 +530,7 @@ export default function WatchPage() {
       y: touch.clientY,
       time: Date.now(),
       isRightHalf,
+      startTime: videoRef.current?.currentTime || 0,
     };
     touchStartXRef.current = touch.clientX;
     touchStartYRef.current = touch.clientY;
@@ -543,17 +544,25 @@ export default function WatchPage() {
     const dx = Math.abs(touch.clientX - touchStartXRef.current);
     const dy = Math.abs(touch.clientY - touchStartYRef.current);
 
-    // Horizontal swipe on right half → seek by position
+    // Horizontal swipe on right half → relative seek from current playback position
     if (dx > 20 && dx > dy) {
       e.preventDefault();
       const video = videoRef.current;
       const wrapper = wrapperRef.current;
       if (!video || !video.duration || !wrapper) return;
+
       const rect = wrapper.getBoundingClientRect();
-      const pct = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width));
-      video.currentTime = pct * video.duration;
-      setCurrentTime(pct * video.duration);
-      setProgress(pct * 100);
+      const signedDx = touch.clientX - touchStartXRef.current;
+      // Drag sensitivity: full player width ≈ 90 seconds.
+      const deltaSeconds = (signedDx / rect.width) * 90;
+      const newTime = Math.max(
+        0,
+        Math.min(video.duration, (touchStartRef.current.startTime || 0) + deltaSeconds)
+      );
+
+      video.currentTime = newTime;
+      setCurrentTime(newTime);
+      setProgress((newTime / video.duration) * 100);
       showControls();
     }
   }, [showControls]);
