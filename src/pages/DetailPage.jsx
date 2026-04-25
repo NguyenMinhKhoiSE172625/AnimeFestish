@@ -16,6 +16,44 @@ function decodeHtml(html) {
   return txt.value;
 }
 
+function normalizeMetaList(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => {
+        if (!item) return null;
+        if (typeof item === "string") return { name: item, slug: item };
+        return {
+          name: item.name || item.title || item.slug || item.id || "",
+          slug: item.slug || item.id || item.name || item.title || "",
+        };
+      })
+      .filter((item) => item?.name);
+  }
+  if (typeof value === "object") {
+    const out = [];
+    Object.values(value).forEach((entry) => {
+      if (!entry) return;
+      if (Array.isArray(entry.list)) {
+        entry.list.forEach((item) => {
+          if (!item) return;
+          out.push({
+            name: item.name || item.title || item.id || "",
+            slug: item.slug || item.id || item.name || item.title || "",
+          });
+        });
+      } else if (entry.name || entry.slug || entry.id) {
+        out.push({
+          name: entry.name || entry.slug || entry.id || "",
+          slug: entry.slug || entry.id || entry.name || "",
+        });
+      }
+    });
+    return out.filter((item) => item?.name);
+  }
+  return [];
+}
+
 export default function DetailPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -134,9 +172,10 @@ export default function DetailPage() {
     );
   }
 
-  const categories = movie.category || [];
-  const countries = movie.country || [];
-  const firstEp = episodes[0]?.server_data?.[0];
+  const categories = normalizeMetaList(movie.category);
+  const countries = normalizeMetaList(movie.country);
+  const firstServer = episodes.find((server) => Array.isArray(server?.server_data) && server.server_data.length > 0);
+  const firstEp = firstServer?.server_data?.[0];
   const EP_LIMIT = 50;
 
   return (
