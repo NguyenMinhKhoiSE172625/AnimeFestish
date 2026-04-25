@@ -188,6 +188,7 @@ export default function WatchPage() {
   const lastTapRef = useRef(0);
   const lastTapXRef = useRef(0);
   const osdTimerRef = useRef(null);
+  const clickSuppressUntilRef = useRef(0);
   const [osd, setOsd] = useState(null); // { type: 'seek' | 'skip', value: number, x: number }
 
   movieRef.current = movie;
@@ -567,6 +568,15 @@ export default function WatchPage() {
     }
   }, [showControls]);
 
+  const hideOrShowControls = useCallback(() => {
+    if (controlsVisible) {
+      clearTimeout(controlsTimerRef.current);
+      setControlsVisible(false);
+    } else {
+      showControls();
+    }
+  }, [controlsVisible, showControls]);
+
   const handleTouchEnd = useCallback((e) => {
     if (!touchStartRef.current) return;
 
@@ -589,12 +599,13 @@ export default function WatchPage() {
         osdTimerRef.current = setTimeout(() => setOsd(null), 600);
       } else {
         lastTapRef.current = start.isRightHalf ? now : 0;
-        showControls();
+        clickSuppressUntilRef.current = now + 500;
+        hideOrShowControls();
       }
     }
 
     touchStartRef.current = null;
-  }, [seekBy, showControls]);
+  }, [seekBy, hideOrShowControls]);
 
   // ...
 
@@ -723,6 +734,10 @@ export default function WatchPage() {
           {/* Touch capture layer — sits above video, below controls. Handles ALL gestures */}
           <div
             className="player-touch-layer"
+            onClick={() => {
+              if (Date.now() < clickSuppressUntilRef.current) return;
+              hideOrShowControls();
+            }}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
