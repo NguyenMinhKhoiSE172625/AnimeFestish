@@ -512,13 +512,16 @@ export default function WatchPage() {
   };
 
   const hideOrShowControls = useCallback(() => {
-    if (controlsVisible) {
+    setControlsVisible((visible) => {
       clearTimeout(controlsTimerRef.current);
-      setControlsVisible(false);
-    } else {
-      showControls();
-    }
-  }, [controlsVisible, showControls]);
+      if (!visible) {
+        controlsTimerRef.current = setTimeout(() => {
+          if (!videoRef.current?.paused) setControlsVisible(false);
+        }, 3500);
+      }
+      return !visible;
+    });
+  }, []);
 
   const showGestureOsd = useCallback((next, delay = 700) => {
     clearTimeout(osdTimerRef.current);
@@ -632,7 +635,7 @@ export default function WatchPage() {
       if (video) video.playbackRate = 1;
       showGestureOsd({ type: 'speed', value: 1, x: 75 }, 350);
       gestureRef.current = null;
-      clickSuppressUntilRef.current = Date.now() + 500;
+      clickSuppressUntilRef.current = Date.now() + 900;
       return;
     }
 
@@ -644,7 +647,7 @@ export default function WatchPage() {
       showControls();
       setOsd(null);
       gestureRef.current = null;
-      clickSuppressUntilRef.current = Date.now() + 500;
+      clickSuppressUntilRef.current = Date.now() + 900;
       return;
     }
 
@@ -652,7 +655,7 @@ export default function WatchPage() {
       clearTimeout(osdTimerRef.current);
       osdTimerRef.current = setTimeout(() => setOsd(null), 650);
       gestureRef.current = null;
-      clickSuppressUntilRef.current = Date.now() + 500;
+      clickSuppressUntilRef.current = Date.now() + 900;
       return;
     }
 
@@ -668,12 +671,12 @@ export default function WatchPage() {
         const delta = g.side === 'left' ? -10 : 10;
         const total = (last.total || 0) + delta;
         lastTapRef.current = { time: now, side: g.side, total };
-        clickSuppressUntilRef.current = now + 500;
+        clickSuppressUntilRef.current = now + 900;
         seekBy(delta);
         showGestureOsd({ type: 'skip', value: total, x: g.side === 'left' ? 25 : 75 }, 650);
       } else {
         lastTapRef.current = { time: now, side: g.side, total: 0 };
-        clickSuppressUntilRef.current = now + 500;
+        clickSuppressUntilRef.current = now + 900;
         hideOrShowControls();
       }
     }
@@ -797,7 +800,9 @@ export default function WatchPage() {
         <div
           className={`player-wrapper ${controlsVisible ? "controls-visible" : "controls-hidden"}`}
           ref={wrapperRef}
-          onMouseMove={showControls}
+          onMouseMove={() => {
+            if (!window.matchMedia?.('(hover: none)').matches) showControls();
+          }}
           onMouseLeave={() => {
             if (!videoRef.current?.paused) setControlsVisible(false);
           }}
