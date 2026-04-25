@@ -19,12 +19,6 @@ export default defineConfig({
         drop_debugger: true,
         passes: 2,
       },
-      mangle: {
-        toplevel: true,
-        properties: {
-          regex: /^_/,
-        },
-      },
       format: {
         comments: false,
       },

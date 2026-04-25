@@ -3,7 +3,6 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   fetchAnimeDetail,
-  fetchKitsuPoster,
   toWebpUrl,
   getImageUrl,
 } from "@/lib/api.js";
@@ -64,7 +63,7 @@ export default function DetailPage() {
   const [error, setError] = useState(null);
   const [expandedServers, setExpandedServers] = useState({});
 
-  const plainDesc = (movie?.content || movie?.description || "")
+  const plainDesc = String(movie?.content || movie?.description || "")
     .replace(/<[^>]*>/g, "")
     .trim();
 
@@ -89,28 +88,24 @@ export default function DetailPage() {
     fetchAnimeDetail(slug)
       .then((resp) => {
         if (cancelled) return;
-        const data = resp.data || resp;
+        const data = resp?.data || resp || {};
         const m = data.item || data.movie || data;
-        const eps = data.episodes || m.episodes || [];
-        const imgCdn = resp._imgCdn || m._imgCdn || "";
+        const rawEpisodes = data.episodes || m.episodes || [];
+        const eps = Array.isArray(rawEpisodes) ? rawEpisodes : [];
+        const imgCdn = resp?._imgCdn || m?._imgCdn || "";
 
         const resolveImg = (file) => {
-          if (!file) return "";
-          if (file.startsWith("http")) return toWebpUrl(file);
-          if (imgCdn) return toWebpUrl(`${imgCdn}${file}`);
-          return getImageUrl(file);
+          const value = String(file || "").trim();
+          if (!value) return "";
+          if (value.startsWith("http")) return toWebpUrl(value);
+          if (imgCdn) return toWebpUrl(`${imgCdn}${value}`);
+          return getImageUrl(value);
         };
 
-        setMovie(m);
+        setMovie(m || {});
         setEpisodes(eps);
-        setPosterUrl(resolveImg(m.poster_url || m.thumb_url));
-        setThumbUrl(resolveImg(m.thumb_url || m.poster_url));
-
-        if (m.origin_name) {
-          fetchKitsuPoster(m.origin_name).then((kitsu) => {
-            if (!cancelled && kitsu?.poster) setPosterUrl(kitsu.poster);
-          });
-        }
+        setPosterUrl(resolveImg(m?.poster_url || m?.thumb_url));
+        setThumbUrl(resolveImg(m?.thumb_url || m?.poster_url));
       })
       .catch((err) => {
         if (!cancelled) setError(err.message);
@@ -172,9 +167,10 @@ export default function DetailPage() {
     );
   }
 
+  const safeEpisodes = Array.isArray(episodes) ? episodes : [];
   const categories = normalizeMetaList(movie.category);
   const countries = normalizeMetaList(movie.country);
-  const firstServer = episodes.find((server) => Array.isArray(server?.server_data) && server.server_data.length > 0);
+  const firstServer = safeEpisodes.find((server) => Array.isArray(server?.server_data) && server.server_data.length > 0);
   const firstEp = firstServer?.server_data?.[0];
   const EP_LIMIT = 50;
 
@@ -238,7 +234,7 @@ export default function DetailPage() {
             <p
               className="detail-desc"
               dangerouslySetInnerHTML={{
-                __html: sanitizeHtml(movie.content || movie.description || "Chua co mo ta."),
+                __html: sanitizeHtml(String(movie.content || movie.description || "Chua co mo ta.")),
               }}
             />
             {firstEp && (
@@ -267,11 +263,11 @@ export default function DetailPage() {
         </div>
       </motion.div>
 
-      {episodes.length > 0 ? (
+      {safeEpisodes.length > 0 ? (
         <div className="episodes-section">
           <h2 className="episodes-title">Danh sach tap</h2>
-          {episodes.map((server, sIdx) => {
-            const eps = server.server_data || [];
+          {safeEpisodes.map((server, sIdx) => {
+            const eps = Array.isArray(server.server_data) ? server.server_data : [];
             const isExpanded = expandedServers[sIdx];
             const visibleEps = isExpanded ? eps : eps.slice(0, EP_LIMIT);
             const needsExpand = eps.length > EP_LIMIT && !isExpanded;
