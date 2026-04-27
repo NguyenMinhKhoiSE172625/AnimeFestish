@@ -160,6 +160,7 @@ export default function WatchPage() {
   const movieRef = useRef(null);
   const currentEpRef = useRef(null);
   const fetchIdRef = useRef(0);
+  const desiredPlayingRef = useRef(true);
 
   const [movie, setMovie] = useState(null);
   const [episodes, setEpisodes] = useState([]);
@@ -206,6 +207,12 @@ export default function WatchPage() {
   );
 
   const destroyHls = useCallback(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
+    }
     if (hlsRef.current) {
       hlsRef.current.destroy();
       hlsRef.current = null;
@@ -218,6 +225,7 @@ export default function WatchPage() {
       if (!video || !url) return;
 
       destroyHls();
+      desiredPlayingRef.current = true;
       setPlayerError(null);
 
       const cleanUrl = getCleanM3u8Url(url);
@@ -226,7 +234,7 @@ export default function WatchPage() {
       if (!Hls.isSupported()) {
         if (video.canPlayType("application/vnd.apple.mpegurl")) {
           video.src = cleanUrl;
-          video.play().catch(() => {});
+          if (desiredPlayingRef.current) video.play().catch(() => {});
         } else {
           setPlayerError("Trình duyệt không hỗ trợ phát video HLS.");
         }
@@ -268,7 +276,9 @@ export default function WatchPage() {
         if (saved && saved.episodeSlug === ep && saved.currentTime > 5) {
           video.currentTime = saved.currentTime - 3;
         }
-        video.play().catch(() => {});
+        if (desiredPlayingRef.current) {
+          video.play().catch(() => {});
+        }
       });
 
       let retryCount = 0;
@@ -279,7 +289,9 @@ export default function WatchPage() {
             retryCount < 3
           ) {
             retryCount++;
-            setTimeout(() => hls.startLoad(), 1000 * retryCount);
+            setTimeout(() => {
+              if (desiredPlayingRef.current) hls.startLoad();
+            }, 1000 * retryCount);
           } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
             hls.recoverMediaError();
           } else {
@@ -396,8 +408,15 @@ export default function WatchPage() {
       }
     };
 
-    const onPlay = () => setPlaying(true);
-    const onPause = () => setPlaying(false);
+    const onPlay = () => {
+      desiredPlayingRef.current = true;
+      setPlaying(true);
+    };
+    const onPause = () => {
+      desiredPlayingRef.current = false;
+      hlsRef.current?.stopLoad?.();
+      setPlaying(false);
+    };
 
     video.addEventListener("timeupdate", onTimeUpdate);
     video.addEventListener("play", onPlay);
@@ -445,8 +464,18 @@ export default function WatchPage() {
   const togglePlay = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
-    if (video.paused) video.play().catch(() => {});
-    else video.pause();
+
+    if (video.paused) {
+      desiredPlayingRef.current = true;
+      hlsRef.current?.startLoad?.();
+      video.play().catch(() => {});
+    } else {
+      desiredPlayingRef.current = false;
+      video.pause();
+      hlsRef.current?.stopLoad?.();
+      setPlaying(false);
+      setControlsVisible(true);
+    }
   }, []);
 
   const seekTo = (pct) => {
