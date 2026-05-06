@@ -29,9 +29,9 @@ const PLAYER_MUTED_KEY = "playerMuted";
 
 function getSavedPlayerAudio() {
   const savedVolume = Number(localStorage.getItem(PLAYER_VOLUME_KEY));
-  const volume = Number.isFinite(savedVolume)
+  const volume = Number.isFinite(savedVolume) && savedVolume > 0
     ? Math.max(0, Math.min(1, savedVolume))
-    : 1;
+    : 0.5;
 
   return {
     volume,
@@ -1247,7 +1247,7 @@ export default function WatchPage() {
                     className="player-ctrl-btn"
                     onClick={() => {
                       const v = videoRef.current;
-                      if (v) v.muted = !v.muted;
+                      if (v) { v.muted = !v.muted; setMuted(v.muted); }
                     }}
                     title={muted ? "Bật tiếng" : "Tắt tiếng"}
                   >
